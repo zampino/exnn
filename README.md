@@ -1,2 +1,3 @@
-# exnn
-Elixir Evolutive Neural Network suite
+# EXNN
+
+_Elixir Evolutive Neural Network suite_
