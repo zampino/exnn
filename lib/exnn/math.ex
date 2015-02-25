@@ -9,11 +9,9 @@ defmodule EXNN.Math do
     x
   end
 
-  def affine_linear(inputs, weights, bias) do
-    zipped = List.zip [inputs, weights]
-    multiply = fn({a, b}) -> a * b end
-    sum = zipped |> Enum.map(multiply) |> Enum.sum
-    sum + bias
+  def labelled_scalar_product({id, weight}, {memo, acc}) do
+    {val, acc} = Keyword.pop_first acc, id
+    {memo + weight * val, acc}
   end
 
 end

@@ -6,16 +6,26 @@ defmodule EXNN.Supervisor do
   end
 
   def init(mod) do
-    IO.puts "start super with #{inspect(mod)}"
     []
-    # |> child(EXNN.Cortex)
+    |> child(EXNN.Config, [mod])
     |> child(EXNN.Connectome, [])
-    |> child(EXNN.Store, [mod])
+    |> child(:supervisor, EXNN.NodeSupervisor, [])
+    |> child(EXNN.Nodes, [])
+    # |> child(:supervisor, EXNN.Nodes.Loader, [])
     |> supervise(strategy: :one_for_one)
   end
 
-  defp child(previous, mod, args) do
-    [worker(mod, args) | previous]
+  defp child(previous, type\\:worker, mod, args) do
+    _worker = worker_for(type, mod, args)
+    previous ++ [_worker]
+  end
+
+  defp worker_for(:worker, mod, args) do
+    worker(mod, args)
+  end
+
+  defp worker_for(:supervisor, mod, args) do
+    supervisor(mod, args)
   end
 
 end

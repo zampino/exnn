@@ -13,15 +13,30 @@ defmodule EXNN.DSL do
     end
   end
 
-  defmacro set_sensor(name, mod, options) do
+  defmacro set_sensor(name, mod, options\\[]) do
     quote do
       @nodes {:sensor, unquote(name), unquote(mod), unquote(options)}
     end
   end
 
-  defmacro set_actuator(name, mod) do
+  defmacro set_actuator(name, mod, options\\[]) do
     quote do
-      @nodes {:actuator, unquote(name), unquote(mod)}
+      @nodes {:actuator, unquote(name), unquote(mod), unquote(options)}
+    end
+  end
+
+  defmacro __before_compile__(env) do
+    _nodes = Module.get_attribute(env.module, :nodes)
+    _nodes = Macro.escape _nodes
+    _pattern = Module.get_attribute(env.module, :initial_pattern)
+    quote do
+      def initial_pattern do
+        unquote _pattern
+      end
+
+      def nodes do
+        unquote _nodes
+      end
     end
   end
 

@@ -12,44 +12,28 @@ defmodule EXNN.Sensor do
     - transform: the transformation function
   """
 
-  # defstruct id: nil, outs: [], transform: &EXNN.Math.id/1
-  #
-  # def new(id, outs) do
-  #   struct __MODULE__, [id: id, outs: outs]
-  # end
-  #
-  # def fire!(sensor, value) do
-  #   notify = fn out_id ->
-  #     GenServer.cast(out_id, {:signal, {sensor.id, value}})
-  #   end
-  #   sensor.outs |> Enum.each notify
-  #   sensor
-  # end
-  #
-  # defimpl EXNN.Connection, for: __MODULE__ do
-  #   def signal(sensor, {_, value}) do
-  #     EXNN.Sensor.fire!(sensor, value)
-  #   end
-  # end
-
   defmacro __using__(options) do
+    state_keyword = options[:with_state] || []
     quote do
-      use GenServer # EXNN.NodeServer
+      use EXNN.NodeServer
+      alias __MODULE__, as: CurrentSensorBase
 
-      def start_link(sensor) do
-        GenServer.start_link(__MODULE__, sensor, name: sensor.id)
+      defstruct unquote(Keyword.merge state_keyword, [id: nil, outs: []])
+
+      def sync(sensor, origin_value) do
+        sensor = before_sync(sensor)
+        impulse = format_impulse(sensor, origin_value)
+        forward = fn(out_id) ->
+          GenServer.cast out_id, {:signal, impulse}
+        end
+        sensor.outs |> Enum.each(forward)
+        sensor
       end
 
-      def handle_cast {:sync, meta}, sensor do
-
-        sensor.outs
-        |> Enum.each &(GenServer.cast(&1, {:signal, format_impulse(sensor, meta)}))
-
-        {:noreply, sensor}
-      end
+      def before_sync(sensor), do: sensor
 
       # format
-      def format_impulse(sensor, meta) do
+      def format_impulse(sensor, origin_value) do
         # TODO: multidimensional sense
         #
         # iterator = fn(x, {list, index})->
@@ -63,8 +47,16 @@ defmodule EXNN.Sensor do
         #
         # list
 
-        {sensor.id, sense(sensor, meta)}
+        {sensor.id, sense(sensor, origin_value)}
       end
+
+      defimpl EXNN.Connection, for: __MODULE__ do
+        def signal(sensor, origin_value) do
+          CurrentSensorBase.sync(sensor, origin_value)
+        end
+      end
+
+      defoverridable [before_sync: 1]
     end
   end
 

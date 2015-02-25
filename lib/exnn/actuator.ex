@@ -11,13 +11,19 @@ defmodule EXNN.Actuator do
     - callback: a callback to process the signal with
 
     """
+
   defmacro __using__(options) do
-    quote do
+    state_keyword = options[:with_state] || []
+    quote(location: :keep) do
+      alias __MODULE__, as: CurrentActuatorBase
+
       use EXNN.NodeServer
 
-      defimpl EXNN.Connection, for: __MODULE__ do
+      defstruct unquote(Keyword.merge state_keyword, [id: nil, ins: []])
+
+      defimpl EXNN.Connection, for: CurrentActuatorBase do
         def signal(actuator, {origin, value}) do
-          __MODULE__.act.(actuator, {origin, value})
+          CurrentActuatorBase.act(actuator, {origin, value})
         end
       end
 

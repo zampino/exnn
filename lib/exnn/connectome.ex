@@ -6,11 +6,11 @@ defmodule EXNN.Connectome do
 
     where N_s, N_i, N_a are natural numbers.
   "
-  def start_link() do
+  def start_link do
     {:ok, pid} = Agent.start_link(fn() -> HashDict.new end,
-      name: :exnn_connectome)
+      name: __MODULE__)
 
-    EXNN.Store.get_pattern
+    EXNN.Config.get_pattern
     |> EXNN.Pattern.build_layers
     |> link([])
     |> store
@@ -24,8 +24,8 @@ defmodule EXNN.Connectome do
   end
 
   def store(genome) do
-    Agent.update(:exnn_connectome,
-      &HashDict.put(&1, genome.id, genome))
+    Agent.update __MODULE__,
+      &HashDict.put(&1, genome.id, genome)
   end
 
   # TOPOLOGY AND CONNECTIONS
