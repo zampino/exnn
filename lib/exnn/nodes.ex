@@ -1,5 +1,5 @@
 defmodule EXNN.Nodes do
-  use GenServer
+  use GenServer, async: true
 
   def start_link do
     GenServer.start_link(__MODULE__,
@@ -14,16 +14,19 @@ defmodule EXNN.Nodes do
   # client api
 
   def register(genome) do
-    GenServer.cast __MODULE__, {:register, genome}
+    GenServer.call __MODULE__, {:register, genome}
   end
 
   def node_pid(id) do
     GenServer.call __MODULE__, {:pids, id}
   end
 
+  def names do
+    GenServer.call __MODULE__, :names
+  end
   # Server callbacks
 
-  def handle_cast({:register, genome}, state) do
+  def handle_call({:register, genome}, _from, state) do
     if HashDict.get(state.names, genome.id) do
       {:noreply, state}
     else
@@ -31,8 +34,12 @@ defmodule EXNN.Nodes do
       ref = Process.monitor(pid)
       refs = HashDict.put state.refs, ref, genome.id
       names = HashDict.put state.names, genome.id, pid
-      {:noreply, %{state | refs: refs, names: names}}
+      {:reply, :ok, %{state | refs: refs, names: names}}
     end
+  end
+
+  def handle_call(:names, _from, state) do
+    {:reply, Dict.keys(state.names), state}
   end
 
   def handle_call({:pids, id}, _from, state) do
@@ -40,7 +47,7 @@ defmodule EXNN.Nodes do
   end
 
   def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
-    IO.puts "DOWN with reason: #{inspect(_reason)}"
+    IO.puts "/////// DOWN with reason: #{inspect(_reason)} ////////////////////"
     {name, refs} = HashDict.pop(state.refs, ref)
     names = HashDict.delete(state.names, name)
     # GenEvent.sync_notify(state.events, {:exit, name, pid})

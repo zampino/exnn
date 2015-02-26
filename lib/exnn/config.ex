@@ -13,11 +13,19 @@ defmodule EXNN.Config do
     Agent.get(__MODULE__, &Map.get(&1, :pattern))
   end
 
+  def sensors do
+    filter = fn({type, id, mod, opts})->
+      type == :sensor
+    end
+    mapper = fn({type, id, mod, opts})-> id end
+    get_remote_nodes
+    |> Enum.filter_map(filter, mapper)
+  end
+
   def config_for(identifier) do
     search_by_id = fn({type, id, mod, opts})->
       (identifier == id) and %{type: type, id: id, mod: mod, opts: opts}
     end
-
     get_remote_nodes
     |> Enum.find_value(search_by_id)
   end

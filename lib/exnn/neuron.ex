@@ -10,7 +10,7 @@ defmodule EXNN.Neuron do
   use EXNN.NodeServer
 
   defstruct id: nil, ins: [], outs: [], bias: 0,
-    activation: &EXNN.Math.tanh/1, acc: [], trigger: []
+    activation: &EXNN.Math.id/1, acc: [], trigger: []
 
   def initialize(genome) do
     Dict.merge(genome, trigger: Dict.keys(genome.ins), acc: [])
@@ -19,8 +19,6 @@ defmodule EXNN.Neuron do
   @doc "broadcast input to registered outs and resets its trigger"
   def fire(%__MODULE__{trigger: []} = neuron) do
     {neuron, value} = impulse(neuron)
-
-    IO.puts "about to cast: #{inspect(neuron.outs)}"
     neuron.outs |>
     Enum.each &(GenServer.cast(&1, {:signal, {neuron.id, value}}))
 
@@ -42,7 +40,6 @@ defmodule EXNN.Neuron do
   end
 
   def signal(neuron, {origin, value}) do
-    IO.puts "fire!"
     acc = neuron.acc ++ [{origin, value}]
     trigger = List.delete(neuron.trigger, origin)
     %__MODULE__{neuron | trigger: trigger, acc: acc}
@@ -51,7 +48,7 @@ defmodule EXNN.Neuron do
 
   defimpl EXNN.Connection, for: __MODULE__ do
     def signal(neuron, {origin, value}) do
-      IO.puts "signaling neuron: #{neuron.id} -- #{inspect(neuron)}"
+      IO.puts "---- signaling neuron: #{neuron.id} -- #{inspect(neuron)} ------"
       EXNN.Neuron.signal(neuron, {origin, value})
     end
   end

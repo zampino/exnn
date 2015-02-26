@@ -1,9 +1,9 @@
 defmodule EXNN.NodesTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   setup do #_all do
-
-    {:ok, node_sup} = EXNN.NodeSupervisor.start_link
+    {_status, node_sup} = EXNN.NodeSupervisor.start_link
+    IO.puts "/////////////////////////////// exnn test node superv tries to start: #{_status}"
     # {:ok, %{sup: node_sup}}
 
     # on_exit fn ->
@@ -26,8 +26,10 @@ defmodule EXNN.NodesTest do
     {:ok, nodes} = EXNN.Nodes.start_link
 
     on_exit fn ->
-      [node_sup, config, nodes]
-      |> Enum.each(&Process.exit(&1, :kill))
+      Process.exit node_sup, :kill
+
+      [config, nodes]
+      |> Enum.each(&Process.exit(&1, :normal))
     end
 
     Process.register self, :test_pid

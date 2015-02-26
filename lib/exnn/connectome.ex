@@ -37,7 +37,7 @@ defmodule EXNN.Connectome do
     [{previous_type, previous_list} | tail] = rest
     genomes = EXNN.Genome.collect(type, list)
     # FIXME: not sure we want to set ins at all!!!
-    genomes = EXNN.Genome.set_ins(genomes, previous_list)
+    |> EXNN.Genome.set_ins(previous_list)
     link(rest, [genomes])
   end
 
@@ -45,7 +45,7 @@ defmodule EXNN.Connectome do
   def link([{first_type, first_list}], acc) do
     [outs | rest] = acc
     genomes = EXNN.Genome.collect(first_type, first_list)
-    EXNN.Genome.set_outs(genomes, outs)
+    |> EXNN.Genome.set_outs(outs)
     link([], [genomes | acc])
   end
 
@@ -53,8 +53,8 @@ defmodule EXNN.Connectome do
     [{previous_type, previous_list} | tail] = rest
     [outs | tail] = acc
     genomes = EXNN.Genome.collect(type, list)
-    genomes = EXNN.Genome.set_ins(genomes, previous_list)
-    genomes = EXNN.Genome.set_outs(genomes, outs)
+    |> EXNN.Genome.set_ins(previous_list)
+    |> EXNN.Genome.set_outs(outs)
     link(rest, [genomes | acc])
   end
 

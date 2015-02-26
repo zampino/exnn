@@ -23,6 +23,7 @@ defmodule EXNN.Sensor do
       def sync(sensor, origin_value) do
         sensor = before_sync(sensor)
         impulse = format_impulse(sensor, origin_value)
+        IO.puts "++++++ sensor impulse: #{inspect(impulse)} to: #{inspect(sensor.outs)} +++++"
         forward = fn(out_id) ->
           GenServer.cast out_id, {:signal, impulse}
         end
