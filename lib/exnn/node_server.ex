@@ -1,4 +1,11 @@
 defmodule EXNN.NodeServer do
+  # public api
+
+  # TODO: maybe import some API module in the quote below
+  def forward(id, message, metadata) do
+    GenServer.call(id, {:forward, message, metadata})
+  end
+
   defmacro __using__(options) do
     quote do
       use GenServer
@@ -13,14 +20,14 @@ defmodule EXNN.NodeServer do
 
       def initialize(genome), do: genome
 
+      # server callbacks
       @doc "NodeServer basic protocol action is to react to
-            a :signal event.
+            a :forward event.
             message is a keyword [origin: value]
 
       "
-      def handle_cast({:signal, message, metadata}, connectable) do
-        connectable = EXNN.Connection.signal(connectable, message, metadata)
-        {:noreply, connectable}
+      def handle_call({:forward, message, metadata}, _from, connectable) do
+        {:reply, :ok, EXNN.Connection.signal(connectable, message, metadata)}
       end
 
       defoverridable [initialize: 1]

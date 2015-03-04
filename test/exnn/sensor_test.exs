@@ -12,8 +12,8 @@ defmodule EXNN.SensorTest do
       {:reply, state, state}
     end
 
-    def handle_cast({:signal, message, _}, state) do
-      {:noreply, state ++ message}
+    def handle_call({:forward, message, _}, _from, state) do
+      {:reply, :ok, state ++ message}
     end
 
   end
@@ -45,7 +45,7 @@ defmodule EXNN.SensorTest do
   end
 
   test "it should catch a signal and forward it to it's outs" do
-    GenServer.cast :my_name, {:signal, :sync, self}
+    EXNN.NodeServer.forward(:my_name, :sync, self)
     :timer.sleep 5
     assert TestOut.state == [my_name_1: 3]
   end

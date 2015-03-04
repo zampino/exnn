@@ -45,7 +45,7 @@ defmodule EXNN.Sensor do
       def forward(sensor, value) do
         spread_value = format_impulse(sensor, value)
         cast_out = fn(out_id) ->
-          GenServer.cast out_id, {:signal, spread_value, spread_value}
+          EXNN.NodeServer.forward(out_id, spread_value, [{sensor.id, value}])
         end
         sensor.outs |> Enum.each(cast_out)
         sensor

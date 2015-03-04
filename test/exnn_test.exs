@@ -67,11 +67,19 @@ defmodule EXNNTest do
   end
 
   test "It should launch a first Training task" do
-    report = EXNN.Trainer.iterate(5)
-    :timer.sleep 500
+    iterations = 1000
+    report = EXNN.Trainer.iterate(iterations)
+
     recorded = GenServer.call(:a_1, :store)
-    IO.puts "==== #{inspect(recorded)} =========="
+    meta = GenServer.call(:a_1, :meta)
+
+    IO.puts "==== #{inspect(recorded)} ========== #{length(recorded)} ========="
+    IO.puts "**** #{inspect(meta)} ************** #{Dict.size(meta)} **********"
+
     assert report == :ok
+    assert length(recorded) == 2*iterations
+    assert Dict.size(meta) == 2*iterations
+
     refute Enum.empty?(recorded)
   end
 end
@@ -105,21 +113,27 @@ end
 
 
 defmodule HostApp.Recorder do
-  use EXNN.Actuator, with_state: [store: []]
+  use EXNN.Actuator, with_state: [store: [], meta: []]
 
-  def act(state, message) do
-    %__MODULE__{state | store: state.store ++ message }
+  def act(state, message, meta) do
+    %__MODULE__{state |
+      store: state.store ++ message,
+      meta: [meta | state.meta]}
   end
 
   def handle_call(:store, _from, state) do
     {:reply, state.store, state}
+  end
+
+  def handle_call(:meta, _from, state) do
+    {:reply, state.meta, state}
   end
 end
 
 defmodule HostApp.SensOne do
   use EXNN.Sensor
 
-  def sense(_sensor, _meta) do
+  def sense(sensor, _meta) do
     {0.1}
   end
 end
@@ -127,7 +141,7 @@ end
 defmodule HostApp.SensTwo do
   use EXNN.Sensor
 
-  def sense(_sensor, _meta) do
+  def sense(sensor, _meta) do
     {0.1, 0.9}
   end
 end

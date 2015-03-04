@@ -4,7 +4,7 @@ defmodule EXNN.ActuatorTest do
   defmodule TestAct do
     use EXNN.Actuator, with_state: [store: []]
 
-    def act(actuator, message) do
+    def act(actuator, message, _) do
      %__MODULE__{actuator | store: actuator.store ++ message}
     end
   end
@@ -16,7 +16,7 @@ defmodule EXNN.ActuatorTest do
       Dict.merge genome, %{store: [init: 'state']}
     end
 
-    def act(actuator, message) do
+    def act(actuator, message, _) do
      %__MODULE__{actuator | store: message ++ actuator.store}
     end
 
@@ -48,7 +48,7 @@ defmodule EXNN.ActuatorTest do
   end
 
   test 'it should implement the nodeserver behaviour' do
-    GenServer.cast :my_name, {:signal, [self: 101], nil}
+    EXNN.NodeServer.forward(:my_name, [self: 101], [])
     :timer.sleep 100
     store = TestActTwo.store
     assert store[:self] == 101

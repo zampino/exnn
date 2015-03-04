@@ -1,7 +1,7 @@
 defmodule EXNN.Trainer do
   use GenServer
 
-  @train_interval 200
+  @train_interval 100
 
   def start_link do
     GenServer.start_link(__MODULE__,
@@ -15,12 +15,12 @@ defmodule EXNN.Trainer do
   end
 
   def train do
+    # IO.puts "^^^^^^^^^ TRAINING ^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     EXNN.Config.sensors |> Enum.each(&train/1)
-    # :timer.sleep @train_interval
   end
 
   def train(sensor_id) do
-    GenServer.cast sensor_id, {:signal, :sync, self}
+    EXNN.NodeServer.forward(sensor_id, :sync, self)
   end
 
   # public api
@@ -30,7 +30,7 @@ defmodule EXNN.Trainer do
 
   # server callbacks
   def handle_call({:iterate, num}, _from, state) do
-    report = Stream.take(state.stream, num) |> Stream.run()
-    {:reply, report, state}
+    num = Enum.take(state.stream, num) |> length()
+    {:reply, :ok, state}
   end
 end

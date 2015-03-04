@@ -4,8 +4,8 @@ defmodule EXNN.NeuronTest do
   defmodule TestServer do
     use GenServer
 
-    def handle_cast({:signal, message, _}, state) do
-      {:noreply, state ++ message}
+    def handle_call({:forward, message, _}, _from, state) do
+      {:reply, :ok, state ++ message}
     end
 
     def handle_call(:state, _from, state) do
@@ -53,7 +53,7 @@ defmodule EXNN.NeuronTest do
     assert state_1 == []
     assert state_2 == []
 
-    neuron = EXNN.Neuron.signal(neuron, [b: 2])
+    neuron = EXNN.Neuron.signal(neuron, [b: 2], [])
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
     assert state_1 == []
@@ -61,7 +61,7 @@ defmodule EXNN.NeuronTest do
     assert neuron.trigger == [:a]
     assert neuron.acc == [c: 7, a: 6, c: 1, b: 2]
 
-    neuron = EXNN.Neuron.signal(neuron, [a: 2])
+    neuron = EXNN.Neuron.signal(neuron, [a: 2], [])
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
     assert state_1 == [me: 15] # 6 + 2 + 7
@@ -69,7 +69,7 @@ defmodule EXNN.NeuronTest do
     assert neuron.trigger == [:a, :b, :c]
     assert neuron.acc == [c: 1, a: 2]
 
-    neuron = EXNN.Neuron.signal(neuron, [c: 1])
+    neuron = EXNN.Neuron.signal(neuron, [c: 1], [])
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
     assert state_1 == [me: 15]
@@ -87,11 +87,11 @@ defmodule EXNN.NeuronTest do
       bias: 0,
       activation: &EXNN.Math.id/1
     }
-    {:ok, pid} = EXNN.Neuron.start_link(genome)
+    {:ok, _pid} = EXNN.Neuron.start_link(genome)
     # :timer.sleep 200
-    GenServer.cast :my_name, {:signal, [c: 3], nil}
-    GenServer.cast :my_name, {:signal, [a: 1], nil}
-    GenServer.cast :my_name, {:signal, [b: 2], nil}
+    EXNN.NodeServer.forward(:my_name, [c: 3], [])
+    EXNN.NodeServer.forward(:my_name, [a: 1], [])
+    EXNN.NodeServer.forward(:my_name, [b: 2], [])
     :timer.sleep 100
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
