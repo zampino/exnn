@@ -22,8 +22,9 @@ defmodule EXNN.Actuator do
       defstruct unquote(Keyword.merge state_keyword, [id: nil, ins: []])
 
       defimpl EXNN.Connection, for: CurrentActuatorBase do
-        def signal(actuator, {origin, value}) do
-          CurrentActuatorBase.act(actuator, {origin, value})
+        def signal(actuator, message, _metadata) do
+          # notify_dispatcher_with(message, metadata)
+          CurrentActuatorBase.act(actuator, message)
         end
       end
 

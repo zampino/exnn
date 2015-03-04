@@ -4,10 +4,8 @@ defmodule EXNN.ActuatorTest do
   defmodule TestAct do
     use EXNN.Actuator, with_state: [store: []]
 
-    def act(actuator, {origin, value}) do
-     result = "reacted on #{origin} and #{value}"
-     store = [result | actuator.store]
-     %__MODULE__{actuator | store: store}
+    def act(actuator, message) do
+     %__MODULE__{actuator | store: actuator.store ++ message}
     end
   end
 
@@ -18,9 +16,8 @@ defmodule EXNN.ActuatorTest do
       Dict.merge genome, %{store: [init: 'state']}
     end
 
-    def act(actuator, {origin, value}) do
-     store = [{origin, value}| actuator.store]
-     %__MODULE__{actuator | store: store}
+    def act(actuator, message) do
+     %__MODULE__{actuator | store: message ++ actuator.store}
     end
 
     def store do
@@ -42,16 +39,16 @@ defmodule EXNN.ActuatorTest do
   test 'it should implement the Connetion protocol based on the act method, aliasing current base module is local', %{genome: genome} do
 
     actuator = struct(TestAct, genome)
-    actuator = EXNN.Connection.signal(actuator, {"origin", "value"})
-    assert actuator.store == ["reacted on origin and value"]
+    actuator = EXNN.Connection.signal(actuator, [origin: "valuex"], nil)
+    assert actuator.store == [origin: "valuex"]
 
     actuator_2 = struct(TestActTwo, genome)
-    actuator_2 = EXNN.Connection.signal(actuator_2, {:origin, "value"})
+    actuator_2 = EXNN.Connection.signal(actuator_2, [origin: "value"], nil)
     assert actuator_2.store == [origin: "value"]
   end
 
   test 'it should implement the nodeserver behaviour' do
-    GenServer.cast :my_name, {:signal, {:self, 101}}
+    GenServer.cast :my_name, {:signal, [self: 101], nil}
     :timer.sleep 100
     store = TestActTwo.store
     assert store[:self] == 101

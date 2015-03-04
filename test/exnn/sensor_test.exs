@@ -12,8 +12,8 @@ defmodule EXNN.SensorTest do
       {:reply, state, state}
     end
 
-    def handle_cast({:signal, {origin, value}}, state) do
-      {:noreply, [{origin, value} | state]}
+    def handle_cast({:signal, message, _}, state) do
+      {:noreply, state ++ message}
     end
 
   end
@@ -25,8 +25,8 @@ defmodule EXNN.SensorTest do
       Dict.merge genome, %{store: [value: 2]}
     end
 
-    def sense(sensor, {pid, :sync}) do
-      sensor.store[:value] + sensor.store[:extra]
+    def sense(sensor, _metadata) do
+      { sensor.store[:value] + sensor.store[:extra] }
     end
 
     def before_sync(sensor) do
@@ -45,9 +45,9 @@ defmodule EXNN.SensorTest do
   end
 
   test "it should catch a signal and forward it to it's outs" do
-    GenServer.cast :my_name, {:signal, {self, :sync}}
-    :timer.sleep 1
-    assert TestOut.state == [my_name: 3]
+    GenServer.cast :my_name, {:signal, :sync, self}
+    :timer.sleep 5
+    assert TestOut.state == [my_name_1: 3]
   end
 
 end

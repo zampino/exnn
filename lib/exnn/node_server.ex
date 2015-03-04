@@ -13,8 +13,13 @@ defmodule EXNN.NodeServer do
 
       def initialize(genome), do: genome
 
-      def handle_cast({:signal, {origin, value}}, connectable) do
-        connectable = EXNN.Connection.signal(connectable, {origin, value})
+      @doc "NodeServer basic protocol action is to react to
+            a :signal event.
+            message is a keyword [origin: value]
+
+      "
+      def handle_cast({:signal, message, metadata}, connectable) do
+        connectable = EXNN.Connection.signal(connectable, message, metadata)
         {:noreply, connectable}
       end
 

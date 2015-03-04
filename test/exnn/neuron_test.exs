@@ -4,10 +4,8 @@ defmodule EXNN.NeuronTest do
   defmodule TestServer do
     use GenServer
 
-    def handle_cast({:signal, {origin, value}}, state) do
-      IO.puts "receiveing: #{origin}, #{value}, #{inspect(state)}"
-      state = [{origin, value} | state]
-      {:noreply, state}
+    def handle_cast({:signal, message, _}, state) do
+      {:noreply, state ++ message}
     end
 
     def handle_call(:state, _from, state) do
@@ -46,7 +44,7 @@ defmodule EXNN.NeuronTest do
     assert neuron.acc == [a: 1, b: 4]
   end
 
-  test "Connection.signal implemntation" do
+  test "Neuron.signal implemntation" do
     neuron = setup_neuron([a: 1, b: 1, c: 1], [:b, :a], [c: 7, a: 6, c: 1])
 
     state_1 = GenServer.call(:test_server_1, :state)
@@ -55,7 +53,7 @@ defmodule EXNN.NeuronTest do
     assert state_1 == []
     assert state_2 == []
 
-    neuron = EXNN.Connection.signal(neuron, {:b, 2})
+    neuron = EXNN.Neuron.signal(neuron, [b: 2])
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
     assert state_1 == []
@@ -63,7 +61,7 @@ defmodule EXNN.NeuronTest do
     assert neuron.trigger == [:a]
     assert neuron.acc == [c: 7, a: 6, c: 1, b: 2]
 
-    neuron = EXNN.Connection.signal(neuron, {:a, 2})
+    neuron = EXNN.Neuron.signal(neuron, [a: 2])
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
     assert state_1 == [me: 15] # 6 + 2 + 7
@@ -71,7 +69,7 @@ defmodule EXNN.NeuronTest do
     assert neuron.trigger == [:a, :b, :c]
     assert neuron.acc == [c: 1, a: 2]
 
-    neuron = EXNN.Connection.signal(neuron, {:c, 1})
+    neuron = EXNN.Neuron.signal(neuron, [c: 1])
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)
     assert state_1 == [me: 15]
@@ -91,9 +89,9 @@ defmodule EXNN.NeuronTest do
     }
     {:ok, pid} = EXNN.Neuron.start_link(genome)
     # :timer.sleep 200
-    GenServer.cast :my_name, {:signal, {:c, 3}}
-    GenServer.cast :my_name, {:signal, {:a, 1}}
-    GenServer.cast :my_name, {:signal, {:b, 2}}
+    GenServer.cast :my_name, {:signal, [c: 3], nil}
+    GenServer.cast :my_name, {:signal, [a: 1], nil}
+    GenServer.cast :my_name, {:signal, [b: 2], nil}
     :timer.sleep 100
     state_1 = GenServer.call(:test_server_1, :state)
     state_2 = GenServer.call(:test_server_2, :state)

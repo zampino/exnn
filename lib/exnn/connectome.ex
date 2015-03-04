@@ -10,9 +10,11 @@ defmodule EXNN.Connectome do
     {:ok, pid} = Agent.start_link(fn() -> HashDict.new end,
       name: __MODULE__)
 
-    EXNN.Config.get_pattern
+    {pattern, dimensions} = EXNN.Config.get_pattern
+
+    pattern
     |> EXNN.Pattern.build_layers
-    |> link([])
+    |> link([], dimensions)
     |> store
 
     {:ok, pid}
@@ -30,32 +32,31 @@ defmodule EXNN.Connectome do
 
   # TOPOLOGY AND CONNECTIONS
 
-  def link([], acc), do: acc
+  def link([], acc, _), do: acc
 
   @doc "actuators are processe as first"
-  def link([{type, list} | rest], []) do
+  def link([{:actuator, list} | rest], [], dimensions) do
     [{previous_type, previous_list} | tail] = rest
-    genomes = EXNN.Genome.collect(type, list)
-    # FIXME: not sure we want to set ins at all!!!
+    genomes = EXNN.Genome.collect(:actuator, list)
     |> EXNN.Genome.set_ins(previous_list)
-    link(rest, [genomes])
+    link(rest, [genomes], dimensions)
   end
 
   @doc "and sensors are last"
-  def link([{first_type, first_list}], acc) do
+  def link([{:sensor, first_list}], acc, dimensions) do
     [outs | rest] = acc
-    genomes = EXNN.Genome.collect(first_type, first_list)
+    genomes = EXNN.Genome.collect(:sensor, first_list)
     |> EXNN.Genome.set_outs(outs)
-    link([], [genomes | acc])
+    link([], [genomes | acc], dimensions)
   end
 
-  def link([{type, list} | rest], acc) do
+  def link([{type, list} | rest], acc, dimensions) do
     [{previous_type, previous_list} | tail] = rest
     [outs | tail] = acc
     genomes = EXNN.Genome.collect(type, list)
-    |> EXNN.Genome.set_ins(previous_list)
+    |> EXNN.Genome.set_ins(previous_list, dimensions)
     |> EXNN.Genome.set_outs(outs)
-    link(rest, [genomes | acc])
+    link(rest, [genomes | acc], dimensions)
   end
 
 

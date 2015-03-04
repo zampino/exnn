@@ -1,15 +1,31 @@
 defmodule EXNN.Sensor do
 
   @moduledoc """
-    #Sensor Data Structure
+    # Sensor Server Protocol
 
-    A sensor receives a signal from the outside world
-    and broadcasts it to the neuron of the front layer
+    Modules using EXNN.Sensor are turned into Sensor Servers
 
-    ### Attributes
+    Sensor modules *MUST* implement either
+    a sense/2 function emitting an enumerable containing impulses
+    of a compatible dimension,
+    or a sync/2 function which returns sensor.
+    Both functions take (sensor, {origin, :sync}) as arguments.
+
+    A sensor has a forward(sensor, value) function available.
+    In case we want to change a sensor's state during sync, we
+    can override a before_synch(sensor) function in case we
+    don't overridde the sync function.
+
+    They share the underlying genome as state, which can
+    be merged with custom attributes and default values
+    passign a with_state option to the use macro.
+
+    A sensor receives or propagates a signal from the outside world
+    and broadcasts it to the neuron of the front layer.
+
+    ## State Attributes
     - id: primary id
     - outs: neuron of the first layer
-    - transform: the transformation function
   """
 
   defmacro __using__(options) do
@@ -20,44 +36,44 @@ defmodule EXNN.Sensor do
 
       defstruct unquote(Keyword.merge state_keyword, [id: nil, outs: []])
 
-      def sync(sensor, origin_value) do
+      @doc "#sense must be implemented in the sensor implementation"
+      def sync(sensor, metadata) do
         sensor = before_sync(sensor)
-        impulse = format_impulse(sensor, origin_value)
-        IO.puts "++++++ sensor impulse: #{inspect(impulse)} to: #{inspect(sensor.outs)} +++++"
-        forward = fn(out_id) ->
-          GenServer.cast out_id, {:signal, impulse}
+        forward(sensor, sense(sensor, metadata))
+      end
+
+      def forward(sensor, value) do
+        spread_value = format_impulse(sensor, value)
+        cast_out = fn(out_id) ->
+          GenServer.cast out_id, {:signal, spread_value, spread_value}
         end
-        sensor.outs |> Enum.each(forward)
+        sensor.outs |> Enum.each(cast_out)
         sensor
       end
 
       def before_sync(sensor), do: sensor
 
-      # format
-      def format_impulse(sensor, origin_value) do
-        # TODO: multidimensional sense
-        #
-        # iterator = fn(x, {list, index})->
-        #   step = {:"#{sensor.id}_#{index}", x}
-        #   {[step | list], index + 1}
-        # end
-        #
-        # {list, num} = tuple
-        # |> Tuple.to_list
-        # |> Enum.foldl({[], 0}, iterator)
-        #
-        # list
-
-        {sensor.id, sense(sensor, origin_value)}
+      @doc "value must be an enumerable compatible with the
+            dimension of the sensor"
+      def format_impulse(sensor, tuple) do
+        sensor_id = sensor.id
+        iterator = fn(val, {list, index})->
+          step = {:"#{sensor_id}_#{index}", val}
+          {[step | list], index + 1}
+        end
+        {list, num} = tuple
+        |> Tuple.to_list
+        |> List.foldl({[], 1}, iterator)
+        list
       end
 
       defimpl EXNN.Connection, for: __MODULE__ do
-        def signal(sensor, origin_value) do
-          CurrentSensorBase.sync(sensor, origin_value)
+        def signal(sensor, :sync, metadata) do
+          CurrentSensorBase.sync(sensor, metadata)
         end
       end
 
-      defoverridable [before_sync: 1]
+      defoverridable [before_sync: 1, sync: 2]
     end
   end
 

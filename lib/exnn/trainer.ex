@@ -20,7 +20,7 @@ defmodule EXNN.Trainer do
   end
 
   def train(sensor_id) do
-    GenServer.cast sensor_id, {:signal, {self, :sync}}
+    GenServer.cast sensor_id, {:signal, :sync, self}
   end
 
   # public api
