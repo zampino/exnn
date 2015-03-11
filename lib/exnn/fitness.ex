@@ -14,24 +14,51 @@ defmodule EXNN.Fitness do
     ```
   """
 
+  # public api
+
+  def eval message, meta do
+    GenServer.cast EXNN.Fitness, {:eval, message, meta}
+  end
+
   defmacro __using__(options) do
     state = options[:state] || []
-    config = options[:config] || []
-    quote(bind_quoted: [name: __MODULE__, custom_state: state]) do
-      use GenServer
 
+    quote(bind_quoted: [
+      state: state]) do
+
+      use GenServer
       defstruct Keyword.merge [acc: []], state
 
-      def start_link do
-        GenServer.start_link(__MODULE__, config, name: name)
+      def start_link do # (config) do
+        GenServer.start_link(__MODULE__, :ok, name: EXNN.Fitness)
       end
 
-      def init(config) do
-        # react on mode = config[:mode]
-        # notify trainer of the chosen mode
-        {:ok, struct(__MODULE__)}
+      def init(:ok) do
+        state = struct(__MODULE__)
+        {:ok, state}
       end
 
+      # internal api
+
+      def eval(_message, _meta) do
+        raise "NotImplementedError"
+      end
+
+      def emit(value) do
+        :ok = EXNN.Trainer.Sync.sync %{fitness: value}
+      end
+
+      # server callbacks
+
+      def handle_cast {:eval, message, meta}, state do
+        {:noreply, eval(message, meta, state)}
+      end
+
+      def handle_call {:eval, message, meta}, _from, state do
+        {:reply, :ok, eval(message, meta, state)}
+      end
+
+      defoverridable [eval: 2]
     end
   end
 end

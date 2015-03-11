@@ -4,7 +4,7 @@ defmodule EXNN.Config do
     store = %{
       remote_nodes: mod.nodes,
       pattern: mod.initial_pattern,
-      fitness: mod.fitness
+      fitness: mod.fitness || {nil, nil}
     }
     Agent.start_link(fn -> store end, name: __MODULE__)
   end

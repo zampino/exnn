@@ -7,10 +7,11 @@ defmodule EXNN.Trainer do
   end
 
   def init(:ok) do
+    IO.puts "starting trainer supervisor"
     []
-    |> child(EXNN.Fitness.Supervisor, :supervisor, [])
+    # |> child(EXNN.Fitness.Supervisor, :supervisor, [])
+    |> child(EXNN.Fitness.Starter, [])
     |> child(EXNN.Trainer.Sync, [])
-    # |> child(EXNN.Fitness.Starter)
     |> supervise(strategy: :one_for_all)
   end
 

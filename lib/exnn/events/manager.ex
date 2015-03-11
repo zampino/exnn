@@ -2,9 +2,7 @@ defmodule EXNN.Events.Manager do
   use GenEvent
 
   def start_link do
-    {:ok, pid} = GenEvent.start_link(name: __MODULE__)
-    # :ok = GenEvent.add_handler(pid, __MODULE__, :ok)
-    {:ok, pid}
+    GenEvent.start_link(name: __MODULE__)
   end
 
   def init(:ok) do
@@ -18,12 +16,14 @@ defmodule EXNN.Events.Manager do
   end
 
   # server callbacks
-  # def handle_event({type, msg}, messages) do
-  #   messages = Map.update messages, type, [], fn(of_type)->
-  #     [msg | of_type]
-  #   end
-  #   IO.puts "processing events"
-  #   {:ok, messages}
-  # end
+  def handle_event({:fitness, {message, metadata}}, messages) do
+    :ok = EXNN.Fitness.eval message, metadata
+    {:ok, messages}
+  end
+
+  def handle_event(_event, messages) do
+    {:ok, messages}
+  end
+
 
 end

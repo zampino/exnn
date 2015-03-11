@@ -1,5 +1,6 @@
 defmodule EXNN.Events.Stream do
   def start_link do
+    IO.puts "starting stream"
     Task.start_link __MODULE__, :run, []
   end
 
@@ -14,7 +15,11 @@ defmodule EXNN.Events.Stream do
     send from, "received #{msg}"
   end
 
+  # def dispatch({:fitness, {message, meta}}) do
+  #   # :ok = EXNN.Fitness.eval(message, meta)
+  # end
+
   def dispatch({_, msg}) do
-    IO.puts "dispatching event #{msg}"
+    IO.puts "dispatching event #{inspect(msg)}"
   end
 end

@@ -47,8 +47,8 @@ defmodule EXNN.Nodes do
   end
 
   def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
-    IO.puts "/////// DOWN with reason: #{inspect(_reason)} ////////////////////"
     {name, refs} = HashDict.pop(state.refs, ref)
+    IO.puts "/////// node: #{name} went DOWN with reason: #{inspect(_reason)} ////////////////////"
     names = HashDict.delete(state.names, name)
     # GenEvent.sync_notify(state.events, {:exit, name, pid})
     {:noreply, %{state | names: names, refs: refs}}

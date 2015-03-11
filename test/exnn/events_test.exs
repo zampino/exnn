@@ -5,7 +5,7 @@ defmodule EXNN.EventsTest do
     {:ok, pid} = EXNN.Events.start_link
 
     on_exit fn ->
-      Process.exit pid, :kill
+      Process.exit pid, :normal
     end
 
     {:ok, [events: pid]}

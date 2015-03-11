@@ -42,12 +42,16 @@ defmodule EXNN.Sensor do
         forward(sensor, sense(sensor, metadata))
       end
 
+      def sense(_, _) do
+        raise "NotImplementedError"
+      end
+
       def forward(sensor, value) do
         spread_value = format_impulse(sensor, value)
         cast_out = fn(out_id) ->
           EXNN.NodeServer.forward(out_id, spread_value, [{sensor.id, value}])
         end
-        sensor.outs |> Enum.each(cast_out)
+        :ok = sensor.outs |> Enum.each(cast_out)
         sensor
       end
 
@@ -73,7 +77,7 @@ defmodule EXNN.Sensor do
         end
       end
 
-      defoverridable [before_sync: 1, sync: 2]
+      defoverridable [before_sync: 1, sync: 2, sense: 2]
     end
   end
 

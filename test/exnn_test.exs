@@ -6,10 +6,13 @@ defmodule EXNNTest do
   """
   setup_all do
     {:ok, _pid} = HostApp.start(:normal, [])
+
     on_exit fn ->
-      IO.puts "terminating app"
       HostApp.stop(:normal)
+      # :timer.sleep 1000
+      IO.puts "terminating app"
     end
+
     :ok
   end
 
@@ -116,7 +119,7 @@ defmodule HostApp.Recorder do
   use EXNN.Actuator, with_state: [store: [], meta: []]
 
   def act(state, message, meta) do
-    %__MODULE__{state |
+    %{state |
       store: state.store ++ message,
       meta: [meta | state.meta]}
   end
