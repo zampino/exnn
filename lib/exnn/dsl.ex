@@ -25,10 +25,18 @@ defmodule EXNN.DSL do
     end
   end
 
+  defmacro set_fitness(mod, options\\[]) do
+    quote do
+      @fitness {unquote(mod), unquote(options)}
+    end
+  end
+
   defmacro __before_compile__(env) do
     _nodes = Module.get_attribute(env.module, :nodes)
     _nodes = Macro.escape _nodes
     _pattern = Module.get_attribute(env.module, :initial_pattern)
+    _fitness = Module.get_attribute(env.module, :fitness)
+
     quote do
       def initial_pattern do
         unquote _pattern
@@ -36,6 +44,10 @@ defmodule EXNN.DSL do
 
       def nodes do
         unquote _nodes
+      end
+
+      def fitness do
+        unquote _fitness
       end
     end
   end

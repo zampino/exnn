@@ -1,17 +1,25 @@
 defmodule EXNN.Config do
 
   def start_link(mod) do
-    store = %{remote_nodes: mod.nodes, pattern: mod.initial_pattern}
+    store = %{
+      remote_nodes: mod.nodes,
+      pattern: mod.initial_pattern,
+      fitness: mod.fitness
+    }
     Agent.start_link(fn -> store end, name: __MODULE__)
   end
 
   def get_remote_nodes do
-    Agent.get(__MODULE__, &Map.get(&1, :remote_nodes))
+    Agent.get __MODULE__, &Map.get(&1, :remote_nodes)
   end
 
   def get_pattern do
-    config = Agent.get(__MODULE__, &(&1))
+    config = Agent.get __MODULE__, &(&1)
     {Map.get(config, :pattern), sensor_dimensions(config)}
+  end
+
+  def get_fitness do
+    Agent.get __MODULE__, &Map.get(&1, :fitness)
   end
 
   def sensor_dimensions(config) do

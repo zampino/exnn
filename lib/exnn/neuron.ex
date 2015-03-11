@@ -17,13 +17,13 @@ defmodule EXNN.Neuron do
   end
 
   @doc "broadcast input to registered outs and resets its trigger"
-  def fire(%__MODULE__{trigger: []} = neuron) do
+  def fire(%{trigger: []} = neuron) do
     {neuron, value} = impulse(neuron)
 
     :ok = neuron.outs |>
     Enum.each(&forward(&1, neuron, value))
 
-    %__MODULE__{neuron | trigger: Dict.keys(neuron.ins)}
+    %{neuron | trigger: Dict.keys(neuron.ins)}
   end
 
   def forward(out_id, neuron, value) do
@@ -39,7 +39,7 @@ defmodule EXNN.Neuron do
                                         {0, neuron.acc},
                                         &EXNN.Math.labelled_scalar_product/2)
 
-    neuron = %__MODULE__{neuron | acc: acc}
+    neuron = %{neuron | acc: acc}
     _impulse = neuron.activation.(activation_input + neuron.bias)
     {neuron, _impulse}
   end
@@ -52,7 +52,7 @@ defmodule EXNN.Neuron do
       List.delete(trigger, origin)
     end)
 
-    %__MODULE__{neuron | trigger: trigger, acc: acc, metadata: metadata}
+    %{neuron | trigger: trigger, acc: acc, metadata: metadata}
     |> fire
   end
 

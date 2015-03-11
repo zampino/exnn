@@ -6,6 +6,11 @@ defmodule EXNN.NodeServer do
     GenServer.call(id, {:forward, message, metadata})
   end
 
+  @doc "injects partially modified genome into node."
+  def patch(id, partial) do
+    GenServer.call(id, {:patch, partial})
+  end
+
   defmacro __using__(options) do
     quote do
       use GenServer
@@ -28,6 +33,11 @@ defmodule EXNN.NodeServer do
       "
       def handle_call({:forward, message, metadata}, _from, connectable) do
         {:reply, :ok, EXNN.Connection.signal(connectable, message, metadata)}
+      end
+
+
+      def handle_call({:patch, partial}, _from, node) do
+        {:reply, :ok, Map.merge(node, partial)}
       end
 
       defoverridable [initialize: 1]

@@ -1,32 +1,24 @@
 defmodule EXNN.Supervisor do
   use Supervisor
+  use EXNN.Utils.Supervisor
 
   def start_link([config: mod]) do
     Supervisor.start_link(__MODULE__, mod)
   end
 
+
+  # TODO: group workers in parent-supervisors
+
   def init(mod) do
     []
     |> child(EXNN.Config, [mod])
+    |> child(EXNN.Events, :supervisor, [])
     |> child(EXNN.Connectome, [])
-    |> child(:supervisor, EXNN.NodeSupervisor, [])
+    |> child(EXNN.NodeSupervisor, :supervisor, [])
     |> child(EXNN.Nodes, [])
     |> child(EXNN.Nodes.Loader, [])
-    |> child(EXNN.Trainer, [])
+    |> child(EXNN.Trainer, :supervisor, [])
     |> supervise(strategy: :one_for_one)
-  end
-
-  defp child(previous, type\\:worker, mod, args) do
-    _worker = worker_for(type, mod, args)
-    previous ++ [_worker]
-  end
-
-  defp worker_for(:worker, mod, args) do
-    worker(mod, args)
-  end
-
-  defp worker_for(:supervisor, mod, args) do
-    supervisor(mod, args)
   end
 
 end

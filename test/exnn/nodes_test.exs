@@ -19,7 +19,8 @@ defmodule EXNN.NodesTest do
         {:sensor, :some_id, TestSensor, []},
         {:actuator, :some_other_id, TestSensor, []}
       ],
-      initial_pattern: []
+      initial_pattern: [],
+      fitness: nil
     }
 
     {:ok, config} = EXNN.Config.start_link(fake_module)

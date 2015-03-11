@@ -68,7 +68,7 @@ defmodule EXNNTest do
 
   test "It should launch a first Training task" do
     iterations = 1000
-    report = EXNN.Trainer.iterate(iterations)
+    report = EXNN.Trainer.Sync.iterate(iterations)
 
     recorded = GenServer.call(:a_1, :store)
     meta = GenServer.call(:a_1, :meta)
