@@ -14,10 +14,10 @@ defmodule EXNN.Fitness do
     ```
   """
 
-  # public api
+  # PUBLIC CLIENT API
 
   def eval message, meta do
-    GenServer.cast EXNN.Fitness, {:eval, message, meta}
+    GenServer.call EXNN.Fitness, {:eval, message, meta}
   end
 
   defmacro __using__(options) do

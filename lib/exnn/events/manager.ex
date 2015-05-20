@@ -9,13 +9,14 @@ defmodule EXNN.Events.Manager do
     {:ok, %{}}
   end
 
-  # public api
+  # PUBLIC CLIENT API
 
   def notify type, msg do
     GenEvent.ack_notify EXNN.Events.Manager, {type, msg}
   end
 
-  # server callbacks
+  # SERVER CALLBACKS
+  
   def handle_event({:fitness, {message, metadata}}, messages) do
     :ok = EXNN.Fitness.eval message, metadata
     {:ok, messages}

@@ -1,11 +1,11 @@
 defmodule EXNN.ActuatorTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   defmodule TestAct do
     use EXNN.Actuator, with_state: [store: []]
 
     def act(actuator, message, _) do
-     %__MODULE__{actuator | store: actuator.store ++ message}
+     %{actuator | store: actuator.store ++ message}
     end
   end
 
@@ -17,7 +17,7 @@ defmodule EXNN.ActuatorTest do
     end
 
     def act(actuator, message, _) do
-     %__MODULE__{actuator | store: message ++ actuator.store}
+     %{actuator | store: message ++ actuator.store}
     end
 
     def store do
@@ -33,6 +33,14 @@ defmodule EXNN.ActuatorTest do
   setup do
     genome = %{id: :my_name, ins: [:a, :b]}
     {:ok, pid} = TestActTwo.start_link(genome)
+
+    {_, events_pid} = GenEvent.start_link name: EXNN.Events.Manager
+    on_exit fn ->
+      if is_pid(events_pid) and Process.alive?(events_pid) do
+        Process.exit events_pid, :kill
+      end
+    end
+
     {:ok, [genome: genome, server: pid]}
   end
 
