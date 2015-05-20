@@ -2,10 +2,10 @@ defmodule EXNN.Actuator do
   @moduledoc """
     # Actuator data structure
 
-      actuators just receive computed signals
-      from neuron of the last layer
+    actuators just receive computed signals
+    from neuron of the outer layer
 
-    ### attributes
+    ### State attributes
     - id: a unique identifier
     - ins: neurons connected to the actuator
     - callback: a callback to process the signal with
@@ -13,14 +13,13 @@ defmodule EXNN.Actuator do
     """
 
   defmacro __using__(options) do
-    quote location: :keep, bind_quoted: [state: (options[:with_state] || [])] do
-      alias __MODULE__, as: CurrentActuatorBase
-
+    caller_mod = __CALLER__.module
+    custom_state = options[:with_state]||[]
+    quote location: :keep do
       use EXNN.NodeServer
+      defstruct Keyword.merge unquote(custom_state), [id: nil, ins: []]
 
-      defstruct Keyword.merge state, [id: nil, ins: []]
-
-      def act(_, _) do
+      def act(_, _, _) do
         raise "NotImplementedError"
       end
 
@@ -29,14 +28,14 @@ defmodule EXNN.Actuator do
         # :ok = EXNN.Fitness.eval message, metadata
       end
 
-      defimpl EXNN.Connection, for: CurrentActuatorBase do
+      defimpl EXNN.Connection do
         def signal(actuator, message, metadata) do
-          CurrentActuatorBase.notify_fitness(message, metadata)
-          CurrentActuatorBase.act(actuator, message, metadata)
+          unquote(caller_mod).notify_fitness(message, metadata)
+          unquote(caller_mod).act(actuator, message, metadata)
         end
       end
 
-      defoverridable [act: 2]
+      defoverridable [act: 3]
     end
   end
 

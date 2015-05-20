@@ -27,7 +27,8 @@ defmodule EXNN.Trainer.Sync do
     :ok = EXNN.NodeServer.forward(sensor_id, :sync, self)
   end
 
-  # public api
+  # CLIENT API
+
   def iterate(cycles) do
     GenServer.call __MODULE__, {:iterate, cycles}
   end

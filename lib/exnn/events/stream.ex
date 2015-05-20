@@ -20,6 +20,7 @@ defmodule EXNN.Events.Stream do
   # end
 
   def dispatch({_, msg}) do
-    IO.puts "dispatching event #{inspect(msg)}"
+    # IO.puts "dispatching event #{inspect(msg)}"
+    :ok
   end
 end

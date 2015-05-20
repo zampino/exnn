@@ -9,7 +9,7 @@ defmodule EXNN.Events do
   def init(:ok) do
     []
     |> child(EXNN.Events.Manager, [])
-    |> child(EXNN.Events.Stream, [])
+    # |> child(EXNN.Events.Stream, [])
     |> supervise(strategy: :one_for_all)
   end
 
