@@ -13,8 +13,8 @@ defmodule XORTest do
   end
 
   test "X or runs!" do
-    assert :ok == EXNN.Trainer.Sync.train
-    :timer.sleep 200
+    :ok = EXNN.Trainer.start
+    :timer.sleep 3000
   end
 end
 

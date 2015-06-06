@@ -1,4 +1,5 @@
 defmodule EXNN.Connectome do
+  import EXNN.Utils.Logger
 
   @doc "accepts patterns of the form:
 
@@ -6,6 +7,10 @@ defmodule EXNN.Connectome do
 
     where N_s, N_i, N_a are natural numbers.
   "
+
+  require Logger
+
+  # TODO: decouple storage from link/patterns
   def start_link do
     {:ok, pid} = Agent.start_link(fn() -> HashDict.new end,
       name: __MODULE__)
@@ -15,19 +20,50 @@ defmodule EXNN.Connectome do
     pattern
     |> EXNN.Pattern.build_layers
     |> link([], dimensions)
-    |> store
+    |> store_all
 
     {:ok, pid}
   end
 
-  def store(collection) when is_list(collection) do
-    collection = List.flatten collection
-    Enum.each collection, &store(&1)
+  def all do
+    unkey = fn(dict)->
+      dict |> Enum.map &(elem(&1, 1))
+    end
+    Agent.get __MODULE__, unkey
+  end
+
+  def neurons do
+    Enum.filter all, &(:neuron == &1.type)
+  end
+
+  def get(id) do
+    Agent.get __MODULE__, &(Dict.get &1, id)
   end
 
   def store(genome) do
     Agent.update __MODULE__,
       &HashDict.put(&1, genome.id, genome)
+  end
+
+  @doc "accepts anything map or dict like"
+  def update(id, dict) do
+    # skim out unwanted keys!
+    safe_dict = struct(EXNN.Genome, dict)
+
+    update_fun = fn(state) ->
+      genome = HashDict.get(state, id)
+      # ugly but used to preserve the type
+      type = genome.type
+      genome = Map.merge(genome, safe_dict)
+      HashDict.put state, id, %{genome | type: type}
+    end
+
+    Agent.update(__MODULE__, update_fun)
+  end
+
+  defp store_all(collection) when is_list(collection) do
+    collection = List.flatten collection
+    Enum.each collection, &store(&1)
   end
 
   # TOPOLOGY AND CONNECTIONS

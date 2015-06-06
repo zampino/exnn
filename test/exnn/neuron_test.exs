@@ -33,7 +33,7 @@ defmodule EXNN.NeuronTest do
       trigger: trigger,
       outs: [:test_server_1, :test_server_2],
       bias: 0,
-      activation: &EXNN.Math.id/1
+      activation: &EXNN.Utils.Math.id/1
     }
   end
 
@@ -85,7 +85,7 @@ defmodule EXNN.NeuronTest do
       ins: [a: 3, b: 2, c: 1],
       outs: [:test_server_1, :test_server_2],
       bias: 0,
-      activation: &EXNN.Math.id/1
+      activation: &EXNN.Utils.Math.id/1
     }
     {:ok, _pid} = EXNN.Neuron.start_link(genome)
     # :timer.sleep 200

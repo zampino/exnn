@@ -1,4 +1,5 @@
 defmodule EXNN.Genome do
+  defstruct id: nil, type: nil, ins: [], outs: []
 
   def collect(type, ids) do
     ids |> Enum.map &build(type, &1)

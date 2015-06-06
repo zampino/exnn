@@ -5,11 +5,10 @@ defmodule EXNNTest do
     Integrative Testing of a remote applicaion
   """
   setup_all do
-    {:ok, _pid} = HostApp.start(:normal, [])
+    {_maybe_ok, _pid} = HostApp.start(:normal, [])
 
     on_exit fn ->
       HostApp.stop(:normal)
-      # :timer.sleep 1000
       IO.puts "terminating app"
     end
 
@@ -69,82 +68,4 @@ defmodule EXNNTest do
                                 :a_1]
   end
 
-  test "It should launch a first Training task" do
-    iterations = 1000
-    report = EXNN.Trainer.Sync.iterate(iterations)
-
-    recorded = GenServer.call(:a_1, :store)
-    meta = GenServer.call(:a_1, :meta)
-
-    IO.puts "==== #{inspect(recorded)} ========== #{length(recorded)} ========="
-    IO.puts "**** #{inspect(meta)} ************** #{Dict.size(meta)} **********"
-
-    assert report == :ok
-    assert length(recorded) == 2*iterations
-    assert Dict.size(meta) == 2*iterations
-
-    refute Enum.empty?(recorded)
-  end
-end
-
-defmodule HostApp do
-  use EXNN.Application
-
-  set_initial_pattern [
-    sensor: [:s_1, :s_2],
-    neuron: {3, 2},
-    actuator: [:a_1]
-  ]
-
-  set_sensor :s_1, HostApp.SensOne, dim: 1
-  set_sensor :s_2, HostApp.SensTwo, dim: 2
-  set_actuator :a_1, HostApp.Recorder
-
-  def start(_type, _args) do
-    import Supervisor.Spec, warn: false
-
-    children = [
-      # Define workers and child supervisors to be supervised
-      # worker(HostApp.Worker, [arg1, arg2, arg3])
-      supervisor(EXNN.Supervisor, [[config: __MODULE__]])
-    ]
-
-    opts = [strategy: :one_for_one, name: HostApp.Supervisor]
-    Supervisor.start_link(children, opts)
-  end
-end
-
-
-defmodule HostApp.Recorder do
-  use EXNN.Actuator, with_state: [store: [], meta: []]
-
-  def act(state, message, meta) do
-    %{state |
-      store: state.store ++ message,
-      meta: [meta | state.meta]}
-  end
-
-  def handle_call(:store, _from, state) do
-    {:reply, state.store, state}
-  end
-
-  def handle_call(:meta, _from, state) do
-    {:reply, state.meta, state}
-  end
-end
-
-defmodule HostApp.SensOne do
-  use EXNN.Sensor
-
-  def sense(sensor, _meta) do
-    {0.1}
-  end
-end
-
-defmodule HostApp.SensTwo do
-  use EXNN.Sensor
-
-  def sense(sensor, _meta) do
-    {0.1, 0.9}
-  end
 end

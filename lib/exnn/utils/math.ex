@@ -1,5 +1,4 @@
-defmodule EXNN.Math do
-
+defmodule EXNN.Utils.Math do
 
   def tanh(x) do
     :math.tanh x
@@ -14,4 +13,7 @@ defmodule EXNN.Math do
     {memo + weight * val, acc}
   end
 
+  def inv_sqrt(num) do
+    1/:math.sqrt(num)
+  end
 end
