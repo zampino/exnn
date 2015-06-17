@@ -8,9 +8,10 @@ defmodule EXNN.Neuron do
            input.
   """
   use EXNN.NodeServer
+  alias EXNN.Utils.Math
 
   defstruct id: nil, ins: [], outs: [], bias: 0,
-    activation: &EXNN.Math.id/1, acc: [], trigger: [], metadata: []
+    activation: nil, acc: [], trigger: [], metadata: []
 
   def initialize(genome) do
     Dict.merge(genome, trigger: Dict.keys(genome.ins), acc: [])
@@ -37,7 +38,7 @@ defmodule EXNN.Neuron do
   def impulse(neuron) do
     {activation_input, acc} = List.foldl(neuron.ins,
                                         {0, neuron.acc},
-                                        &EXNN.Math.labelled_scalar_product/2)
+                                        &Math.labelled_scalar_product/2)
 
     neuron = %{neuron | acc: acc}
     _impulse = neuron.activation.(activation_input + neuron.bias)
@@ -56,7 +57,7 @@ defmodule EXNN.Neuron do
     |> fire
   end
 
-  defimpl EXNN.Connection, for: __MODULE__ do
+  defimpl EXNN.Connection do
     def signal(neuron, message, metadata) do
       EXNN.Neuron.signal(neuron, message, metadata)
     end

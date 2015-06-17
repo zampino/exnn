@@ -19,7 +19,7 @@ defmodule EXNN.SensorTest do
   end
 
   defmodule TestSensorX do
-    use EXNN.Sensor, with_state: [store: []]
+    use EXNN.Sensor, state: [store: []]
 
     def initialize(genome) do
       Dict.merge genome, %{store: [value: 2]}

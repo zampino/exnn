@@ -1,8 +1,30 @@
 defmodule EXNN.Genome do
+  @moduledoc """
+    # EXNN.Genome
+
+    a genome is the basic information
+    a cell cares about
+    it will specialized once injected into a Specific NodeServer
+    where it will drop the type.
+
+    On the contrary
+  """
+
+  # NOTE: struct is only used in update operations
+  defstruct id: nil, type: nil, ins: [], outs: [], bias: 0, activation: nil
+
+  alias EXNN.Utils.Random
+  alias EXNN.Utils.Math
 
   def collect(type, ids) do
     ids |> Enum.map &build(type, &1)
   end
+
+  def build(:neuron, id) do
+    %{type: :neuron, id: id, bias: random_bias, activation: &Math.sin(&1)}
+  end
+
+  def random_bias, do: Math.pi * Random.uniform
 
   def build(type, id) do
     %{type: type, id: id}
@@ -21,10 +43,10 @@ defmodule EXNN.Genome do
 
   def set_ins(:neuron, genome, in_ids, dimensions) do
     in_ids = inflate_ins(in_ids, dimensions)
-
     with_random_weight = fn in_id ->
-      {in_id, :random.uniform}
+      {in_id, Random.uniform}
     end
+
     ins = Enum.map in_ids, with_random_weight
     Map.merge genome, %{ins: ins}
   end

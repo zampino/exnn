@@ -1,0 +1,21 @@
+defmodule EXNN.Utils.Math do
+
+  def pi, do: :math.pi
+
+  def id(x), do: x
+
+  def tanh(x), do: :math.tanh(x)
+
+  def sqrt(x), do: :math.sqrt(x)
+
+  def inv_sqrt(x), do: 1/:math.sqrt(x)
+
+  def sin(x), do: :math.sin(x)
+
+  def sigmoid(x, k)
+
+  def labelled_scalar_product({id, weight}, {memo, acc}) do
+    {val, acc} = Keyword.pop_first acc, id
+    {memo + weight * val, acc}
+  end
+end

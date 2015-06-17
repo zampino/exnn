@@ -1,5 +1,7 @@
 defmodule EXNN.Trainer.Sync do
   use GenServer
+  import EXNN.Utils.Logger
+  alias EXNN.Trainer.Mutations
 
   @train_interval 100
 
@@ -9,63 +11,77 @@ defmodule EXNN.Trainer.Sync do
       name: __MODULE__)
   end
 
+  # TODO: make params configurable over Conf
   def init(:ok) do
-    {:ok, %{
-      stream: Stream.repeatedly(&train/0),
-      fitness: {nil, nil},
-      counter: 0,
-      sensors: EXNN.Config.sensors
+    {:ok,
+      %{
+        fitness: 0,
+        counter: 0,
+        # TODO: get sensors from connectome for consistency
+        sensors: EXNN.Config.sensors,
+        max_attempts: 2000,
+        restarts: 0,
+        reverts_count: 0,
+        max_reverts: 80
       }
     }
   end
 
-  def train(state\\%{sensors: EXNN.Config.sensors}) do
-    state.sensors |> Enum.each(&sync_sensor/1)
+  def sync(data\\%{}) do
+    GenServer.call __MODULE__, {:sync, data}
   end
+
+  # public for testing
+
+  def train(sensors) do
+    sensors |> Enum.each(&sync_sensor/1)
+  end
+
+  # private
 
   def sync_sensor(sensor_id) do
     :ok = EXNN.NodeServer.forward(sensor_id, :sync, self)
   end
 
-  # CLIENT API
-
-  def iterate(cycles) do
-    GenServer.call __MODULE__, {:iterate, cycles}
+  def schedule_training_task(sensors) do
+    {:ok, pid} = Task.start __MODULE__, :train, [sensors]
+    ref = Process.monitor pid
+    {:ok, ref}
   end
 
-  def sync(%{fitness: value}) do
-    state = GenServer.call __MODULE__, {:fitness, value}
-    # react on new_state
-    IO.puts "new state #{inspect(state)}\n\n"
-    {:ok, pid} = Task.start __MODULE__, :train, [state]
-    Process.monitor pid
-    # train
-    :ok
-  end
-
-  # SERVER CALLBACKS
-
-  def handle_call({:iterate, num}, _from, state) do
-    ^num = Enum.take(state.stream, num) |> length()
-    {:reply, :ok, state}
-  end
-
-  def handle_call :train, _from, state do
-    :ok = state.sensors |> Enum.each(&sync_sensor/1)
-    {:reply, :ok, state}
-  end
-
-  def handle_call {:fitness, value}, _from, state do
-    if state.counter > 10 do
-      Process.exit self, :terminate
+  def handle_call {:sync, %{fitness: value}}, _from, state do
+    new_state = cond do
+      state.counter > state.max_attempts -> exit(:normal)
+      state.reverts_count > state.max_reverts -> reset(state)
+      value <= state.fitness -> less_fit(state)
+      true -> fitter(state, value)
     end
-    {last, old} = state.fitness
-    state = %{state | counter: state.counter + 1, fitness: {value, last}}
-    {:reply, state , state}
+    Mutations.step
+    {:ok, _ref} = schedule_training_task state.sensors
+    log "STATS:", state, :info
+    {:reply, :ok, %{new_state | counter: new_state.counter + 1}}
+  end
+
+  def handle_call {:sync, %{}}, _from, state do
+    ref = schedule_training_task state.sensors
+    {:reply, :ok, state}
   end
 
   def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
-    IO.puts "/////// Sync DOWN with reason: #{inspect(_reason)} ////////////////////"
     {:noreply, state}
+  end
+
+  defp reset(%{restarts: count}=state) do
+    Mutations.reset
+    %{state | reverts_count: 0, restarts: count + 1}
+  end
+
+  defp less_fit(%{reverts_count: count}=state) do
+    Mutations.revert
+    %{state | reverts_count: count + 1}
+  end
+
+  defp fitter(state, value) do
+    %{state | fitness: value, reverts_count: 0}
   end
 end

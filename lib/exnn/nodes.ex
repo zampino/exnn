@@ -50,7 +50,9 @@ defmodule EXNN.Nodes do
     {name, refs} = HashDict.pop(state.refs, ref)
     IO.puts "/////// node: #{name} went DOWN with reason: #{inspect(_reason)} ////////////////////"
     names = HashDict.delete(state.names, name)
-    # GenEvent.sync_notify(state.events, {:exit, name, pid})
+    # TODO: reload the node from current connectome
+    # genome = EXNN.Connectome.at name
+    # {refs, names} = start_node(genome, refs, names)
     {:noreply, %{state | names: names, refs: refs}}
   end
 

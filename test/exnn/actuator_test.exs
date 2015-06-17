@@ -2,7 +2,7 @@ defmodule EXNN.ActuatorTest do
   use ExUnit.Case, async: true
 
   defmodule TestAct do
-    use EXNN.Actuator, with_state: [store: []]
+    use EXNN.Actuator, state: [store: []]
 
     def act(actuator, message, _) do
      %{actuator | store: actuator.store ++ message}
@@ -10,7 +10,7 @@ defmodule EXNN.ActuatorTest do
   end
 
   defmodule TestActTwo do
-    use EXNN.Actuator, with_state: [store: []]
+    use EXNN.Actuator, state: [store: []]
 
     def initialize(genome) do
       Dict.merge genome, %{store: [init: 'state']}

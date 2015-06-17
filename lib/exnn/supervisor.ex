@@ -6,7 +6,6 @@ defmodule EXNN.Supervisor do
     Supervisor.start_link(__MODULE__, mod)
   end
 
-
   # TODO: group workers in parent-supervisors
 
   def init(mod) do
@@ -17,7 +16,7 @@ defmodule EXNN.Supervisor do
     |> child(EXNN.NodeSupervisor, :supervisor, [])
     |> child(EXNN.Nodes, [])
     |> child(EXNN.Nodes.Loader, [])
-    |> child(EXNN.Trainer, :supervisor, [])
+    |> child(EXNN.Trainer.Supervisor, :supervisor, [])
     |> supervise(strategy: :one_for_one)
   end
 

@@ -5,7 +5,6 @@ defmodule EXNN.Pattern do
   end
 
   def map([], acc) do
-    IO.puts "layers: #{inspect(acc)}"
     acc
   end
 

@@ -1,18 +1,6 @@
 defmodule EXNN.Trainer do
-  use Supervisor
-  use EXNN.Utils.Supervisor
-
-  def start_link do
-    Supervisor.start_link(__MODULE__, :ok)
+  def start do
+    # here the trainer FSM enters training mode
+    EXNN.Trainer.Sync.sync
   end
-
-  def init(:ok) do
-    IO.puts "starting trainer supervisor"
-    []
-    # |> child(EXNN.Fitness.Supervisor, :supervisor, [])
-    |> child(EXNN.Fitness.Starter, [])
-    |> child(EXNN.Trainer.Sync, [])
-    |> supervise(strategy: :one_for_all)
-  end
-
 end

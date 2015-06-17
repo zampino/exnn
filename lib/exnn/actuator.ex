@@ -14,7 +14,7 @@ defmodule EXNN.Actuator do
 
   defmacro __using__(options) do
     caller_mod = __CALLER__.module
-    custom_state = options[:with_state]||[]
+    custom_state = options[:state]||[]
     quote location: :keep do
       use EXNN.NodeServer
       defstruct Keyword.merge unquote(custom_state), [id: nil, ins: []]

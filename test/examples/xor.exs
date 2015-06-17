@@ -13,8 +13,8 @@ defmodule XORTest do
   end
 
   test "X or runs!" do
-    assert :ok == EXNN.Trainer.Sync.train
-    :timer.sleep 200
+    :ok = EXNN.Trainer.start
+    :timer.sleep 5000
   end
 end
 
@@ -44,7 +44,7 @@ end
 
 defmodule XORApp.Domain do
   use EXNN.Sensor,
-    with_state: [
+    state: [
       domain: [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}]
     ]
 
@@ -58,7 +58,7 @@ defmodule XORApp.Domain do
 end
 
 defmodule XORApp.Range do
-  use EXNN.Actuator, with_state: []
+  use EXNN.Actuator, state: []
 
   def act(state, message, meta) do
     state
@@ -67,10 +67,11 @@ end
 
 defmodule XORApp.Fitness do
   @domain [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}]
+  alias EXNN.Utils.Math
+  import EXNN.Utils.Logger
 
   use EXNN.Fitness, state: [
-    trigger: [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}],
-    init_trigger: [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}],
+    trigger: @domain,
     acc: []
   ]
 
@@ -84,7 +85,9 @@ defmodule XORApp.Fitness do
   end
 
   def distance_squared(state) do
-    state.acc |> Enum.map(&diff_squared/1) |> Enum.sum
+    acc = state.acc
+    log "computed: ", acc
+    acc |> Enum.map(&diff_squared/1) |> Enum.sum # |> Math.sqrt
   end
 
   def eval([{:neuron_l2_1, y}], [{:s, x}], state) do
@@ -98,7 +101,7 @@ defmodule XORApp.Fitness do
 
   def fire(%{trigger: []} = state) do
     :ok = emit 1/(1 + distance_squared(state))
-    %{state | acc: [], trigger: state.init_trigger}
+    %{state | acc: [], trigger: @domain}
   end
 
   def fire(state), do: state
