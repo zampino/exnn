@@ -11,17 +11,18 @@ defmodule EXNN.Trainer.Sync do
       name: __MODULE__)
   end
 
+  # TODO: make params configurable over Conf
   def init(:ok) do
-    {:ok, %{
-      # stream: Stream.repeatedly(&train/0),
-      fitness: {0, 0},
-      counter: 0,
-      attempts: 0,
-      # TODO: get sensors from connectome for consistency
-      sensors: EXNN.Config.sensors,
-      max_attempts: 1000, # Conf.max_attempts
-      reverts_count: 0,
-      max_reverts: 500
+    {:ok,
+      %{
+        fitness: 0,
+        counter: 0,
+        # TODO: get sensors from connectome for consistency
+        sensors: EXNN.Config.sensors,
+        max_attempts: 2000,
+        restarts: 0,
+        reverts_count: 0,
+        max_reverts: 80
       }
     }
   end
@@ -45,53 +46,20 @@ defmodule EXNN.Trainer.Sync do
   def schedule_training_task(sensors) do
     {:ok, pid} = Task.start __MODULE__, :train, [sensors]
     ref = Process.monitor pid
-    # train
     {:ok, ref}
   end
 
-  # def handle_call {:fitness, value}, _from, state do
-  #   if state.counter > state.max_attempts do
-  #     Process.exit self, :terminate
-  #   end
-  #   {last, old} = state.fitness
-  #   state = %{state | counter: state.counter + 1, fitness: {value, last}}
-  #   {:reply, state , state}
-  # end
-
   def handle_call {:sync, %{fitness: value}}, _from, state do
-    {last, old} = state.fitness
-    log "FITNESS ARRIVED", state, :debug
-    log "with value: ", value
-
-    reverts_count = state.reverts_count
-
-    if state.counter > state.max_attempts do
-      Process.exit self, :terminate
+    new_state = cond do
+      state.counter > state.max_attempts -> exit(:normal)
+      state.reverts_count > state.max_reverts -> reset(state)
+      value <= state.fitness -> less_fit(state)
+      true -> fitter(state, value)
     end
-
-    if reverts_count > state.max_reverts do
-      raise("MaxDiscardsReached")
-    end
-
-    if value < last do
-      log "<< reverting >>", "", :debug
-      Mutations.revert
-      reverts_count = reverts_count + 1
-      Mutations.step
-    else
-      Mutations.step
-      reverts_count = 0
-    end
-
-    ref = schedule_training_task state.sensors
-
-    state = %{state |
-      counter: state.counter + 1,
-      reverts_count: reverts_count,
-      fitness: {value, last}
-    }
-
-    {:reply, :ok, state}
+    Mutations.step
+    {:ok, _ref} = schedule_training_task state.sensors
+    log "STATS:", state, :info
+    {:reply, :ok, %{new_state | counter: new_state.counter + 1}}
   end
 
   def handle_call {:sync, %{}}, _from, state do
@@ -100,7 +68,20 @@ defmodule EXNN.Trainer.Sync do
   end
 
   def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
-    IO.puts "/////// Sync DOWN with reason: #{inspect(_reason)} ////////////////////"
     {:noreply, state}
+  end
+
+  defp reset(%{restarts: count}=state) do
+    Mutations.reset
+    %{state | reverts_count: 0, restarts: count + 1}
+  end
+
+  defp less_fit(%{reverts_count: count}=state) do
+    Mutations.revert
+    %{state | reverts_count: count + 1}
+  end
+
+  defp fitter(state, value) do
+    %{state | fitness: value, reverts_count: 0}
   end
 end

@@ -29,13 +29,15 @@ defmodule EXNN.Trainer.Mutations do
     GenServer.call __MODULE__, :revert
   end
 
+  def reset do
+    GenServer.call __MODULE__, :reset
+  end
+
   # server callbacks
 
   def handle_call :step, _from, state do
-    log "step", [], :debug
     mutation_set = Set.generate(state.neurons)
     {:ok, neurons} = Agent.apply mutation_set
-
     {:reply, :ok, %{state |
       neurons: neurons,
       history: [mutation_set | state.history]}
@@ -43,10 +45,14 @@ defmodule EXNN.Trainer.Mutations do
   end
 
   def handle_call :revert, _from, state do
-    log "revert", [], :debug
     [mutation_set | rest] = state.history
-    inverse_set = Set.invert mutation_set
-    {:ok, neurons} = Agent.apply inverse_set
+    {:ok, neurons} = Set.invert(mutation_set) |> Agent.apply
     {:reply, :ok, %{state | neurons: neurons, history: rest}}
+  end
+
+  def handle_call :reset, _from, state do
+    mutation = Set.reset(state.neurons)
+    {:ok, neurons} = Agent.apply mutation
+    {:reply, :ok, %{state | neurons: neurons, history: []}}
   end
 end

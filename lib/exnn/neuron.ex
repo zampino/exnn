@@ -11,7 +11,7 @@ defmodule EXNN.Neuron do
   alias EXNN.Utils.Math
 
   defstruct id: nil, ins: [], outs: [], bias: 0,
-    activation: &Math.id/1, acc: [], trigger: [], metadata: []
+    activation: nil, acc: [], trigger: [], metadata: []
 
   def initialize(genome) do
     Dict.merge(genome, trigger: Dict.keys(genome.ins), acc: [])
@@ -57,7 +57,7 @@ defmodule EXNN.Neuron do
     |> fire
   end
 
-  defimpl EXNN.Connection, for: __MODULE__ do
+  defimpl EXNN.Connection do
     def signal(neuron, message, metadata) do
       EXNN.Neuron.signal(neuron, message, metadata)
     end

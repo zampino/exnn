@@ -18,7 +18,7 @@ defmodule EXNN.Sensor do
 
     They share the underlying genome as state, which can
     be merged with custom attributes and default values
-    passign a with_state option to the use macro.
+    passign a state option to the use macro.
 
     A sensor receives or propagates a signal from the outside world
     and broadcasts it to the neuron of the front layer.
@@ -29,7 +29,7 @@ defmodule EXNN.Sensor do
   """
 
   defmacro __using__(options) do
-    state_keyword = options[:with_state] || []
+    state_keyword = options[:state] || []
     quote do
       use EXNN.NodeServer
       alias __MODULE__, as: CurrentSensorBase

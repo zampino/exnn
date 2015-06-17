@@ -28,7 +28,7 @@ end
 
 
 defmodule HostApp.Recorder do
-  use EXNN.Actuator, with_state: [store: [], meta: []]
+  use EXNN.Actuator, state: [store: [], meta: []]
 
   def act(state, message, meta) do
     %{state |

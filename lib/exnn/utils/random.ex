@@ -2,6 +2,7 @@ defmodule EXNN.Utils.Random do
   @moduledoc false
   # NOTE: Randomness is NOT Math
   import EXNN.Utils.Logger
+  import EXNN.Utils.Math, only: [pi: 0]
 
   def seed do
     :random.seed :erlang.now
@@ -12,29 +13,25 @@ defmodule EXNN.Utils.Random do
   end
 
   def coefficient(value) do
-    :math.pi * value * (:random.uniform - 1)
+    value * pi * (:random.uniform - 0.5)
   end
 
-  # def sample(set) do
-  #   [return] = sample(set, 1)
-  #   return
-  # end
+  def take(list) do
+    [return] = take(list, 1)
+    return
+  end
 
-  # @doc "randomly chooses size distinct elements out of set"
-  # def sample(set, size) when is_integer(size) do
-  #   seed
-  #   0..size-1
-  #   |> Enum.shuffle
-  #   |> Enum.map(fn(index)-> Enum.to_list(set) |> Enum.at(index) end)
-  # end
+  @doc "randomly chooses size distinct elements out of list"
+  def take(list, size) when is_integer(size) do
+    0..length(list)-1
+    |> Enum.shuffle
+    |> Enum.take(size)
+    |> Enum.map(fn(index)-> Enum.at(list, index) end)
+  end
 
   @doc "choses elements out of set with probability p"
   def sample(set, p) when is_list(set) do
-    seed
     filtered = Enum.filter(set, &(&1 && uniform < p))
-    # log "taken:", Enum.count filtered
-    # log "of:", Enum.count set
-    # log "with:", p
     filtered
   end
 

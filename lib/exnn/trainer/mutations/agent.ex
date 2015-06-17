@@ -15,16 +15,29 @@ defmodule EXNN.Trainer.Mutations.Agent do
     Task.async __MODULE__, :apply_mutation, [mutation]
   end
 
-  def apply_mutation %Mutation{
-    type: :alter_weights,
+  def apply_mutation(%Mutation{
+    type: type,
     id: id,
-    changes: changes} do
+    changes: changes}) when type in [:alter_weights, :reset_weigths] do
 
     patch_fn = fn(genome)->
       new_weights = changes |> Enum.reduce genome.ins, fn({key, old, new}, weights)->
         Keyword.put weights, key, new
       end
       %{ins: new_weights}
+    end
+
+    res = EXNN.NodeServer.patch(id, patch_fn)
+    EXNN.Connectome.update(id, res)
+  end
+
+  def apply_mutation(%Mutation{
+    type: type,
+    id: id,
+    changes: {:bias, old, new}}) do
+
+    patch_fn = fn(genome)->
+      %{bias: new}
     end
 
     res = EXNN.NodeServer.patch(id, patch_fn)

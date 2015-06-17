@@ -14,13 +14,12 @@ defmodule EXNN.Trainer.MutationsTest do
   test "Generate a Mutation" do
     mutation_set = EXNN.Connectome.neurons |> Set.generate()
     Enum.each mutation_set, fn(mutation)->
-      assert match?(%Set.Mutation{type: :alter_weights}, mutation)
+      assert match?(%Set.Mutation{}, mutation)
     end
   end
 
   test "Apply a Mutation" do
     mutation = EXNN.Connectome.neurons |> Set.generate() |> List.first
-    log "mutation", mutation
     Agent.apply_mutation mutation
   end
 
