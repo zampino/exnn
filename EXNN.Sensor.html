@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>EXNN.Sensor</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="css/elixir.css" type="text/css" media="screen" charset="utf-8" />
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/highlight.pack.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      hljs.initHighlightingOnLoad();
+      hljs.configure({languages: []}); //disable autodetect
+    </script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <section id="content">
+      <div class="breadcrumbs">exnn v0.0.1 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="EXNN.html">EXNN</a> &rarr; <a href="EXNN.Sensor.html">Sensor</a></div>
+      <h1>
+        EXNN.Sensor
+        
+      </h1>
+
+      <ul class="summary_links">
+        
+        
+        
+        
+        
+      </ul>
+
+      
+        <section id="moduledoc" class="docstring">
+          <p><em>Sensor server metamodule to be used within your implementation</em></p>
+<h4>Modules using EXNN.Sensor are turned into Sensor servers.</h4>
+<p>Sensor modules <em>MUST</em> implement either
+a <code class="inline">sense/2</code> function emitting a tuple containing scalar impulses
+of length compatible with the configured dimension,
+or a <code class="inline">sync/2</code> function which returns sensor.
+Both functions take (sensor, {origin, :sync}) as arguments.</p>
+<p>A sensor has a forward(sensor, value) function available.
+In case we want to change a sensor’s state during sync, we
+can override a <code class="inline">before_synch(state)</code> function in case we
+don’t overridde the sync function.</p>
+<p>They share the underlying genome as state, which can
+be merged with custom attributes and default values
+passign a state option to the use macro.</p>
+<p>A sensor receives or propagates a signal from the outside world
+and broadcasts it to the neuron of the front layer.</p>
+<h2>State Attributes</h2>
+<ul>
+<li>id: primary id
+</li>
+<li>outs: neuron of the first layer
+</li>
+</ul>
+
+        </section>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+    </section>
+  </body>
+</html>
