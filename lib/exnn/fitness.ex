@@ -17,30 +17,27 @@ defmodule EXNN.Fitness do
   # PUBLIC CLIENT API
 
   def eval message, meta do
-    GenServer.call EXNN.Fitness, {:eval, message, meta}
+    GenServer.call __MODULE__, {:eval, message, meta}
   end
 
   defmacro __using__(options) do
     state = options[:state] || []
 
-    quote(bind_quoted: [
-      state: state]) do
-
+    quote(bind_quoted: [state: state]) do
       use GenServer
-      defstruct Keyword.merge [acc: []], state
+      defstruct state
 
-      def start_link do # (config) do
+      def start_link do
         GenServer.start_link(__MODULE__, :ok, name: EXNN.Fitness)
       end
 
       def init(:ok) do
-        state = struct(__MODULE__)
-        {:ok, state}
+        {:ok, struct(__MODULE__)}
       end
 
       # internal api
 
-      def eval(_message, _meta) do
+      def eval(_message, _meta, _state) do
         raise "NotImplementedError"
       end
 
@@ -58,7 +55,7 @@ defmodule EXNN.Fitness do
         {:reply, :ok, eval(message, meta, state)}
       end
 
-      defoverridable [eval: 2]
+      defoverridable [eval: 3]
     end
   end
 end

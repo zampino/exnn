@@ -13,19 +13,19 @@ defmodule EXNN.DSL do
     end
   end
 
-  defmacro set_sensor(name, mod, options\\[]) do
+  defmacro sensor(name, mod, options\\[]) do
     quote do
       @nodes {:sensor, unquote(name), unquote(mod), unquote(options)}
     end
   end
 
-  defmacro set_actuator(name, mod, options\\[]) do
+  defmacro actuator(name, mod, options\\[]) do
     quote do
       @nodes {:actuator, unquote(name), unquote(mod), unquote(options)}
     end
   end
 
-  defmacro set_fitness(mod, options\\[]) do
+  defmacro fitness(mod, options\\[]) do
     quote do
       @fitness {unquote(mod), unquote(options)}
     end

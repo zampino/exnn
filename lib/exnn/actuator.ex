@@ -2,7 +2,7 @@ defmodule EXNN.Actuator do
   @moduledoc """
     # Actuator data structure
 
-    actuators just receive computed signals
+    actuators just receives computed signals
     from neuron of the outer layer
 
     ### State attributes
@@ -30,8 +30,9 @@ defmodule EXNN.Actuator do
 
       defimpl EXNN.Connection do
         def signal(actuator, message, metadata) do
+          state = unquote(caller_mod).act(actuator, message, metadata)
           unquote(caller_mod).notify_fitness(message, metadata)
-          unquote(caller_mod).act(actuator, message, metadata)
+          state
         end
       end
 

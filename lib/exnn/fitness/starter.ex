@@ -5,7 +5,10 @@ defmodule EXNN.Fitness.Starter do
     if fitness_mod == nil do
       {:ok, self}
     else
-      :ok = GenEvent.add_handler(EXNN.Events.Manager, EXNN.Events.Manager, :ok)
+      :ok = GenEvent.add_handler(EXNN.Events.Manager,
+        EXNN.Events.Manager,
+        :ok)
+
       {:ok, _pid} = apply fitness_mod, :start_link, []
     end
   end

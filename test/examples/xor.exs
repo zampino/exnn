@@ -22,9 +22,9 @@ end
 defmodule XORApp do
   use EXNN.Application
 
-  set_sensor :s, XORApp.Domain, dim: 2
-  set_actuator :a, XORApp.Range
-  set_fitness XORApp.Fitness, mode: :sync # :continuous
+  sensor :s, XORApp.Domain, dim: 2
+  actuator :a, XORApp.Range
+  fitness XORApp.Fitness, mode: :sync # :continuous
 
   set_initial_pattern [
     sensor: [:s],
@@ -90,7 +90,7 @@ defmodule XORApp.Fitness do
     acc |> Enum.map(&diff_squared/1) |> Enum.sum # |> Math.sqrt
   end
 
-  def eval([{:neuron_l2_1, y}], [{:s, x}], state) do
+  def eval([neuron_l2_1: y], [s: x], state) do
     update(state, x, y) |> fire()
   end
 

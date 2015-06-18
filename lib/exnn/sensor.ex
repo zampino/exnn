@@ -1,38 +1,39 @@
 defmodule EXNN.Sensor do
 
   @moduledoc """
-    # Sensor Server Protocol
+  _Sensor server metamodule to be used within your implementation_
 
-    Modules using EXNN.Sensor are turned into Sensor Servers
+  #### Modules using EXNN.Sensor are turned into Sensor servers.
 
-    Sensor modules *MUST* implement either
-    a sense/2 function emitting an enumerable containing impulses
-    of a compatible dimension,
-    or a sync/2 function which returns sensor.
-    Both functions take (sensor, {origin, :sync}) as arguments.
+  Sensor modules *MUST* implement either
+  a `sense/2` function emitting a tuple containing scalar impulses
+  of length compatible with the configured dimension,
+  or a `sync/2` function which returns sensor.
+  Both functions take (sensor, {origin, :sync}) as arguments.
 
-    A sensor has a forward(sensor, value) function available.
-    In case we want to change a sensor's state during sync, we
-    can override a before_synch(sensor) function in case we
-    don't overridde the sync function.
+  A sensor has a forward(sensor, value) function available.
+  In case we want to change a sensor's state during sync, we
+  can override a `before_synch(state)` function in case we
+  don't overridde the sync function.
 
-    They share the underlying genome as state, which can
-    be merged with custom attributes and default values
-    passign a state option to the use macro.
+  They share the underlying genome as state, which can
+  be merged with custom attributes and default values
+  passign a state option to the use macro.
 
-    A sensor receives or propagates a signal from the outside world
-    and broadcasts it to the neuron of the front layer.
+  A sensor receives or propagates a signal from the outside world
+  and broadcasts it to the neuron of the front layer.
 
-    ## State Attributes
-    - id: primary id
-    - outs: neuron of the first layer
+  ## State Attributes
+  - id: primary id
+  - outs: neuron of the first layer
   """
 
   defmacro __using__(options) do
     state_keyword = options[:state] || []
-    quote do
+    caller = __CALLER__.module
+    quote(location: :keep) do
       use EXNN.NodeServer
-      alias __MODULE__, as: CurrentSensorBase
+      # alias __MODULE__, as: CurrentSensorBase
 
       defstruct unquote(Keyword.merge state_keyword, [id: nil, outs: []])
 
@@ -73,7 +74,7 @@ defmodule EXNN.Sensor do
 
       defimpl EXNN.Connection, for: __MODULE__ do
         def signal(sensor, :sync, metadata) do
-          CurrentSensorBase.sync(sensor, metadata)
+          unquote(caller).sync(sensor, metadata)
         end
       end
 

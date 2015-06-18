@@ -8,9 +8,9 @@ defmodule HostApp do
     actuator: [:a_1]
   ]
 
-  set_sensor :s_1, HostApp.SensOne, dim: 1
-  set_sensor :s_2, HostApp.SensTwo, dim: 2
-  set_actuator :a_1, HostApp.Recorder
+  sensor :s_1, HostApp.SensOne, dim: 1
+  sensor :s_2, HostApp.SensTwo, dim: 2
+  actuator :a_1, HostApp.Recorder
 
   def start(_type, _args\\[]) do
     import Supervisor.Spec #, warn: false
@@ -25,7 +25,6 @@ defmodule HostApp do
     Supervisor.start_link(children, opts)
   end
 end
-
 
 defmodule HostApp.Recorder do
   use EXNN.Actuator, state: [store: [], meta: []]
