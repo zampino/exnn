@@ -1,21 +1,16 @@
 # EXNN ![travis](https://travis-ci.org/zampino/exnn.svg)
-_Evolutive Neural Networks framework à la G.I.Sher written in Elixir_
+_Evolutive Neural Networks framework à la G.Sher written in Elixir_
 
 
 # Preliminary Notice
 The work presented here is _strongly_ influenced
-by the seminal book [Handbook of Neuroevolution Through Erlang](http://www.springer.com/de/book/9781461444626) by Gene I. Sher, which is a vast source of inspiring concepts and thoughts on the topic.
+by the seminal book [Handbook of Neuroevolution Through Erlang](http://www.springer.com/de/book/9781461444626) by Gene I.Sher, which is a vast source of inspiring concepts and thoughts on the topic.
 
-Needless to say, all erlang-specific concepts and the algorithmic
-toolsets are to be credited the author of the book.
-In a later section I will outline on which aspects of the code I can
-claim as original.
-
-I tried to not just translate from Erlang
-the code examples in the book, but went through the effort
-of exploiting (and learning!) both Elixir/OTP idioms and
-their expressive power along with the
- basics of unsupervised learning algorithms.
+Needless to say, the choice for specific algorithmic
+toolsets and the overall strategy are to be credited
+the author of the book. On the other hand I tried to give the whole system
+a modular and configurable approach exploiting Elixir/OTP idioms and
+their expressive power.
 
 At present this library is
 in a very early stage,
@@ -186,8 +181,7 @@ end
 ```
 
 # Examples
-At present you can only run EXNN over tests, check out
-how to train a basic XOR problem by running:
+You can -- at present -- train a basic XOR problem by running:
 
 ```
 mix test test/examples/xor_test.exs
@@ -195,9 +189,9 @@ mix test test/examples/xor_test.exs
 
 # Core Concepts
 
-- Sensors, Neuron and Actuators all live as GenServer registered with
-  an identifier present in the original genome. They specialise an abstract
-  `EXNN.NodeServer` and implement a `EXNN.Connection` protocol to forward signnals
+- Sensors, Neuron and Actuators all live as GenServer processes registered with
+  an identifier present in the underlying genome. They specialise an abstract
+  `EXNN.NodeServer` and implement a `EXNN.Connection` protocol to forward signals
   between nodes.
 
 - Fitness modules intercept signals from the final neural layer and evaluates
