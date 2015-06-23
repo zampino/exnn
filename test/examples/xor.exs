@@ -26,11 +26,11 @@ defmodule XORApp do
   actuator :a, XORApp.Range
   fitness XORApp.Fitness, mode: :sync # :continuous
 
-  set_initial_pattern [
+  initial_pattern([
     sensor: [:s],
     neuron: {2, 1},
     actuator: [:a]
-  ]
+  ])
 
   def start(_, _) do
     import Supervisor.Spec, warn: false

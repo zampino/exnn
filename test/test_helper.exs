@@ -2,7 +2,7 @@
 defmodule HostApp do
   use EXNN.Application
 
-  set_initial_pattern [
+  initial_pattern [
     sensor: [:s_1, :s_2],
     neuron: {3, 2},
     actuator: [:a_1]
