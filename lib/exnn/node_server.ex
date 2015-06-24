@@ -40,6 +40,7 @@ defmodule EXNN.NodeServer do
         {:reply, :ok, EXNN.Connection.signal(connectable, message, metadata)}
       end
 
+      # TODO: move to neuron 
       def handle_call({:patch, fun}, _from, node) do
         state = Map.merge(node, fun.(node))
         destruct = Map.from_struct state

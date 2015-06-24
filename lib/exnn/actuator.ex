@@ -12,14 +12,14 @@ defmodule EXNN.Actuator do
 
     """
 
-  defmacro __using__(options) do
-    caller_mod = __CALLER__.module
-    custom_state = options[:state]||[]
+  defmacro __using__(options \\ []) do
+    caller = __CALLER__.module
     quote location: :keep do
       use EXNN.NodeServer
-      defstruct Keyword.merge unquote(custom_state), [id: nil, ins: []]
+      defstruct unquote(options) |>
+        Keyword.get(:state, []) |> Dict.merge([id: nil, ins: []])
 
-      def act(_, _, _) do
+      def act(_state, _message, _meta) do
         raise "NotImplementedError"
       end
 
@@ -30,8 +30,8 @@ defmodule EXNN.Actuator do
 
       defimpl EXNN.Connection do
         def signal(actuator, message, metadata) do
-          state = unquote(caller_mod).act(actuator, message, metadata)
-          unquote(caller_mod).notify_fitness(message, metadata)
+          state = unquote(caller).act(actuator, message, metadata)
+          unquote(caller).notify_fitness(message, metadata)
           state
         end
       end

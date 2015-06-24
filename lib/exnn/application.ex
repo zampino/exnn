@@ -3,7 +3,7 @@ defmodule EXNN.Application do
     _Gentle wrapper around OTP Application + DSL importer_
   """
 
-  defmacro __using__(opts) do
+  defmacro __using__(_) do
     quote do
       unquote import_dsl()
       use Application

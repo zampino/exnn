@@ -93,11 +93,15 @@ You have to implement the function `sense/2` which is called when
 
 On the other hand,
 since it's a genserver registered with its module name, you can reach it
-from whatever external service providing sample data:
+from any external service providing sample data:
+
+An optional `state` given to `use` accepts a keywork list to
+feed initial conditions to the genserver state.
+The state itself is a struct, named by your module's name.
 
 ```elixir
 defmodule MyApp.TempSensor do
-  use EXNN.Sensor, state: %{outer_temp: 0}
+  use EXNN.Sensor, state: [outer_temp: 0]
 
   def sense(state, _metadata) do
     {state.outer_temp}
@@ -109,7 +113,7 @@ defmodule MyApp.TempSensor do
 end
 
 defmodule MyApp.WindSensor do
-  use EXNN.Sensor, state: %{speed: 0, direction: 0 * :math.pi}
+  use EXNN.Sensor, state: [speed: 0, direction: 0 * :math.pi]
 
   def sense(state, _meta) do
     {state.speed, state.direction})

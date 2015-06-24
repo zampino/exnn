@@ -28,14 +28,12 @@ defmodule EXNN.Sensor do
   - outs: neuron of the first layer
   """
 
-  defmacro __using__(options) do
-    state_keyword = options[:state] || []
+  defmacro __using__(options \\ []) do
     caller = __CALLER__.module
-    quote(location: :keep) do
+    quote location: :keep do
       use EXNN.NodeServer
-      # alias __MODULE__, as: CurrentSensorBase
-
-      defstruct unquote(Keyword.merge state_keyword, [id: nil, outs: []])
+      defstruct unquote(options) |>
+        Keyword.get(:state, []) |> Dict.merge([id: nil, outs: []])
 
       @doc "#sense must be implemented in the sensor implementation"
       def sync(sensor, metadata) do
@@ -43,7 +41,7 @@ defmodule EXNN.Sensor do
         forward(sensor, sense(sensor, metadata))
       end
 
-      def sense(_, _) do
+      def sense(_state, _metadata) do
         raise "NotImplementedError"
       end
 

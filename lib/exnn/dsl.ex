@@ -1,8 +1,11 @@
 defmodule EXNN.DSL do
 
-  defmacro extend_struct struct_mod, keyword do
+  defmacro extend_struct(struct_mod, keyword) do
     quote do
-      defstruct Keyword.merge(  Map.to_list(Map.from_struct(unquote(struct_mod).__struct__)), unquote(keyword))
+      defstruct unquote(struct_mod).__struct__
+        |> Map.from_struct
+        |> Map.to_list
+        |> Keyword.merge(unquote(keyword))
     end
   end
 
