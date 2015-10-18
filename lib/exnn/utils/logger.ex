@@ -5,7 +5,8 @@ defmodule EXNN.Utils.Logger do
   # end
   require Elixir.Logger, as: Logger
 
-  def log(head, inspected, level\\:warn) do
-    apply(Logger, :log, [level, "#{head}\n#{inspect inspected}"])
+  defmacro log(head, inspected, level\\:warn) do
+    # NOTE: Logger.log/? was removed in Elixir 1.1
+    Macro.expand "Logger.#{level} \"#{head}\n#{inspect inspected}\"", __ENV__
   end
 end

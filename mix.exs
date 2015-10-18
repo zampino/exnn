@@ -2,10 +2,20 @@ defmodule EXNN.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :exnn,
-     version: "0.0.1",
-     elixir: "~> 1.0",
-     deps: deps]
+    [
+      app: :exnn,
+      version: "0.0.1",
+      elixir: "~> 1.1",
+      deps: deps,
+      name: "EXNN",
+      description: ~s(Elixir Evolutive Neural Networks "<> <<224::utf8>> <>" la G.Sher),
+      homepage_url: "https://github.com/zampino/exnn",
+      docs: [
+        extras: ["README.md"], main: "extra-readme",
+        # source_url: "https:://github.com/zampino/exnn",
+        # logo: "logo.png",
+      ]
+   ]
   end
 
   # Configuration for the OTP application
@@ -14,21 +24,12 @@ defmodule EXNN.Mixfile do
   def application do
     [
       applications: [:logger],
-     # mod: {EXNN, []}
+      # mod: {EXNN, []}
      ]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type `mix help deps` for more examples and options
   defp deps do
-    [{:ex_doc, "0.7.3", only: :dev},
-    {:earmark, ">= 0.0.0"}]
+    [{:ex_doc, "~> 0.10", only: :dev},
+    {:earmark, "~> 0.1", only: :dev}]
   end
 end
