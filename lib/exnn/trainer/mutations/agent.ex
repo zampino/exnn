@@ -1,6 +1,6 @@
 defmodule EXNN.Trainer.Mutations.Agent do
   @moduledoc false
-  import EXNN.Utils.Logger
+  # import EXNN.Utils.Logger
   alias EXNN.Trainer.Mutations.Set.Mutation
 
   def apply mutation_set do

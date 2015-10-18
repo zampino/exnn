@@ -5,7 +5,7 @@ defmodule EXNNTest do
     Integrative Testing of a remote applicaion
   """
   setup_all do
-    {_maybe_ok, _pid} = HostApp.start(:normal, [])
+    {_maybe_started, _pid} = HostApp.start(:normal, [])
 
     on_exit fn ->
       HostApp.stop(:normal)

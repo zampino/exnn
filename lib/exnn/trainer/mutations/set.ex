@@ -1,6 +1,6 @@
 defmodule EXNN.Trainer.Mutations.Set do
   @moduledoc false
-  import EXNN.Utils.Logger
+  # import EXNN.Utils.Logger
 
   alias EXNN.Utils.Math
   alias EXNN.Utils.Random
@@ -56,7 +56,7 @@ defmodule EXNN.Trainer.Mutations.Set do
     defstruct type: nil, id: nil, changes: []
 
     def new(genome, type: type) do
-      log "MUTATE:", {genome.id, type}, :debug
+      # log "MUTATE:", {genome.id, type}, :debug
       struct(__MODULE__, [type: type, id: genome.id]) |> build_changes(genome)
     end
 

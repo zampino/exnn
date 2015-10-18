@@ -26,5 +26,4 @@ defmodule EXNN.Events.Manager do
     {:ok, messages}
   end
 
-
 end

@@ -16,7 +16,7 @@ defmodule EXNN.Connectome do
   """
 
   alias EXNN.Utils.Random
-  import EXNN.Utils.Logger
+  # import EXNN.Utils.Logger
 
   # TODO: decouple storage from link/patterns
   #       into Connectome.Links and Connectome.Pattern

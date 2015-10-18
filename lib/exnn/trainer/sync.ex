@@ -1,6 +1,8 @@
 defmodule EXNN.Trainer.Sync do
   use GenServer
-  import EXNN.Utils.Logger
+  # # import EXNN.Utils.Logger
+  import Logger
+
   alias EXNN.Trainer.Mutations
 
   @tolerance 0.001
@@ -67,7 +69,8 @@ defmodule EXNN.Trainer.Sync do
     end
     Mutations.step
     schedule_training_task state.sensors
-    log "STATS:", state, :info
+    # log "STATS:", state, :info
+    Logger.info "#{inspect state}"
     {:reply, :ok, %{new_state | counter: new_state.counter + 1}}
   end
 

@@ -1,12 +1,12 @@
 defmodule EXNN.Trainer.MutationsTest do
   alias EXNN.Trainer.Mutations.Set
   alias EXNN.Trainer.Mutations.Agent
-  import EXNN.Utils.Logger
+  # import EXNN.Utils.Logger
 
   use ExUnit.Case
 
   setup_all do
-    {_maybe_ok, _pid} = HostApp.start(:normal, [])
+    {_maybe_started, _pid} = HostApp.start(:normal, [])
     on_exit(fn -> HostApp.stop(:normal) end)
     :ok
   end

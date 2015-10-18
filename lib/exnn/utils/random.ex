@@ -1,7 +1,7 @@
 defmodule EXNN.Utils.Random do
   @moduledoc false
   # NOTE: Randomness is NOT Math
-  import EXNN.Utils.Logger
+  # import EXNN.Utils.Logger
   import EXNN.Utils.Math, only: [pi: 0]
 
   def seed do

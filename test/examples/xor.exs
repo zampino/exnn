@@ -14,7 +14,7 @@ defmodule XORTest do
 
   test "X or runs!" do
     :ok = EXNN.Trainer.start
-    :timer.sleep 5000
+    :timer.sleep 3000
   end
 end
 
@@ -68,7 +68,7 @@ end
 defmodule XORApp.Fitness do
   @domain [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}]
   alias EXNN.Utils.Math
-  import EXNN.Utils.Logger
+  # import EXNN.Utils.Logger
 
   use EXNN.Fitness, state: [
     trigger: @domain,
@@ -86,7 +86,7 @@ defmodule XORApp.Fitness do
 
   def distance_squared(state) do
     acc = state.acc
-    log "computed: ", acc
+    # log "computed: ", acc
     acc |> Enum.map(&diff_squared/1) |> Enum.sum # |> Math.sqrt
   end
 
