@@ -13,7 +13,7 @@ defmodule EXNN.Trainer.Mutations.Set do
     # :delete_link,
     # :add_node,
     # :remove_node
-    :alter_bias
+    # :alter_bias
     # :alter_activation
     # :swap_activation
   ]

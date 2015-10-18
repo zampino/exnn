@@ -3,6 +3,8 @@ defmodule EXNN.Trainer.Sync do
   import EXNN.Utils.Logger
   alias EXNN.Trainer.Mutations
 
+  @tolerance 0.001
+
   @train_interval 100
 
   def start_link do
@@ -49,15 +51,22 @@ defmodule EXNN.Trainer.Sync do
     {:ok, ref}
   end
 
+  # def handle_call({:sync, %{fitness: value}}, _from, state)
+  #   when value > 1 - @tolerance do
+  #   log "PASS", ""
+  #   schedule_training_task state.sensors
+  #   {:reply, :ok, %{state | counter: state.counter + 1}}
+  # end
+
   def handle_call {:sync, %{fitness: value}}, _from, state do
     new_state = cond do
-      state.counter > state.max_attempts -> exit(:normal)
+      state.counter > state.max_attempts      -> exit(:normal)
       state.reverts_count > state.max_reverts -> reset(state)
-      value <= state.fitness -> less_fit(state)
-      true -> fitter(state, value)
+      value <= state.fitness                  -> less_fit(state)
+      true                                    -> fitter(state, value)
     end
     Mutations.step
-    {:ok, _ref} = schedule_training_task state.sensors
+    schedule_training_task state.sensors
     log "STATS:", state, :info
     {:reply, :ok, %{new_state | counter: new_state.counter + 1}}
   end

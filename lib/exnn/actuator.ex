@@ -31,6 +31,7 @@ defmodule EXNN.Actuator do
       defimpl EXNN.Connection do
         def signal(actuator, message, metadata) do
           state = unquote(caller).act(actuator, message, metadata)
+          # TODO: pass actuator state to fitness as well
           unquote(caller).notify_fitness(message, metadata)
           state
         end

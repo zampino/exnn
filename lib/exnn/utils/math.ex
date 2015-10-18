@@ -4,6 +4,12 @@ defmodule EXNN.Utils.Math do
 
   def id(x), do: x
 
+  def sign(0), do: 0
+  def sign(0.0), do: 0
+  def sign(x) do
+    :erlang.trunc(abs(x)/x)
+  end
+
   def tanh(x), do: :math.tanh(x)
 
   def sqrt(x), do: :math.sqrt(x)

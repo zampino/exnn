@@ -34,7 +34,6 @@ defmodule EXNN.Fitness do
       end
 
       # internal api
-
       def eval(_message, _meta, _state) do
         raise "NotImplementedError"
       end
@@ -44,7 +43,6 @@ defmodule EXNN.Fitness do
       end
 
       # server callbacks
-
       def handle_cast {:eval, message, meta}, state do
         {:noreply, eval(message, meta, state)}
       end

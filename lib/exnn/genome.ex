@@ -20,11 +20,11 @@ defmodule EXNN.Genome do
     ids |> Enum.map &build(type, &1)
   end
 
-  def build(:neuron, id) do
-    %{type: :neuron, id: id, bias: random_bias, activation: &Math.sin(&1)}
-  end
+  def random_bias, do: (Math.pi * Random.uniform)
 
-  def random_bias, do: Math.pi * Random.uniform
+  def build(:neuron, id) do
+    %{type: :neuron, id: id, activation: &Math.sin(&1), bias: random_bias}
+  end
 
   def build(type, id) do
     %{type: type, id: id}

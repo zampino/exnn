@@ -16,7 +16,7 @@ defmodule EXNN.Events.Manager do
   end
 
   # SERVER CALLBACKS
-  
+
   def handle_event({:fitness, {message, metadata}}, messages) do
     :ok = EXNN.Fitness.eval message, metadata
     {:ok, messages}
