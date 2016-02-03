@@ -1,29 +1,24 @@
 # EXNN ![travis](https://travis-ci.org/zampino/exnn.svg)
 _Evolutive Neural Networks framework à la G.Sher written in Elixir_
 
-
 # Preliminary Notice
 The work presented here is _strongly_ influenced
 by the seminal book [Handbook of Neuroevolution Through Erlang](http://www.springer.com/de/book/9781461444626) by Gene I.Sher, which is a vast source of inspiring concepts and thoughts on the topic.
 
-Needless to say, the choice for specific algorithmic
-toolsets and the overall strategy are to be credited
-the author of the book. On the other hand I tried to give the whole system
-a modular and configurable approach exploiting Elixir/OTP idioms and
-their expressive power.
+On the other hand I tried to give the whole system
+a modular and configurable DSL-like approach exploiting Elixir macros and protocols,
+as well as OTP application components.
 
-At present this library is
-in a very early stage,
-and it's impossible for me to tell where it will lead. Any kind of
-help or suggestions on the code is warmly appreciated.
-The future of `EXNN` is strictly unsupervised as well.
+# :construction: All this is quite still in progress :construction:
+
+This library is in a very early stage, and it can at the moment only train a trivial _xor_ function. With some love and time, it will see some improvements.
 
 # Docs
 
 I am slowly building an ex_doc [Documentation](http://zampino.github.io/exnn)
 out of the code.
 
-# Usage
+# Usage Instructions
 
 To use EXNN you will first mix EXNN as dependency and then
 push `EXNN.Supervisor` module into the stack
