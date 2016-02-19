@@ -16,8 +16,10 @@ defmodule EXNN.Actuator do
     caller = __CALLER__.module
     quote location: :keep do
       use EXNN.NodeServer
-      defstruct unquote(options) |>
-        Keyword.get(:state, []) |> Dict.merge([id: nil, ins: []])
+
+      defstruct unquote(options)
+        |> Keyword.get(:state, [])
+        |> Dict.merge([id: nil, ins: []])
 
       def act(_state, _message, _meta) do
         raise "NotImplementedError"
@@ -28,7 +30,9 @@ defmodule EXNN.Actuator do
         # :ok = EXNN.Fitness.eval message, metadata
       end
 
-      defimpl EXNN.Connection do
+      defimpl EXNN.Connection, for: unquote(caller) do
+        require Logger
+        Logger.debug "PROTOCOL #{inspect @protocol} IMPL FOR #{inspect @for}"
         def signal(actuator, message, metadata) do
           state = unquote(caller).act(actuator, message, metadata)
           # TODO: pass actuator state to fitness as well

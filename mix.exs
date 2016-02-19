@@ -4,12 +4,13 @@ defmodule EXNN.Mixfile do
   def project do
     [
       app: :exnn,
-      version: "0.0.1",
-      elixir: "~> 1.1",
+      version: "0.1.0",
+      elixir: "~> 1.2",
       deps: deps,
       name: "EXNN",
       description: ~s(Elixir Evolutive Neural Networks "<> <<224::utf8>> <>" la G.Sher),
       homepage_url: "https://github.com/zampino/exnn",
+      consolidate_protocols: Mix.env != :test,
       docs: [
         extras: ["README.md"], main: "extra-readme",
         # source_url: "https:://github.com/zampino/exnn",
