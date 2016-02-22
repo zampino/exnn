@@ -1,4 +1,5 @@
 defmodule EXNN.Nodes do
+  require Logger
   use GenServer, async: true
 
   def start_link do
@@ -46,9 +47,9 @@ defmodule EXNN.Nodes do
     {:reply, state.names[id], state}
   end
 
-  def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
+  def handle_info({:DOWN, ref, :process, _pid, reason}, state) do
     {name, refs} = HashDict.pop(state.refs, ref)
-    IO.puts "/////// node: #{name} went DOWN with reason: #{inspect(_reason)} ////////////////////"
+    Logger.info "[EXNN.Nodes] - DOWN - node: #{name} went down with reason: #{inspect reason}"
     names = HashDict.delete(state.names, name)
     # TODO: reload the node from current connectome
     # genome = EXNN.Connectome.at name

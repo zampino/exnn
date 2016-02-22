@@ -1,7 +1,6 @@
 defmodule EXNN.Trainer.Sync do
   use GenServer
-  # # import EXNN.Utils.Logger
-  import Logger
+  require Logger
 
   alias EXNN.Trainer.Mutations
 
@@ -53,13 +52,6 @@ defmodule EXNN.Trainer.Sync do
     {:ok, ref}
   end
 
-  # def handle_call({:sync, %{fitness: value}}, _from, state)
-  #   when value > 1 - @tolerance do
-  #   log "PASS", ""
-  #   schedule_training_task state.sensors
-  #   {:reply, :ok, %{state | counter: state.counter + 1}}
-  # end
-
   def handle_call {:sync, %{fitness: value}}, _from, state do
     new_state = cond do
       state.counter > state.max_attempts      -> exit(:normal)
@@ -67,19 +59,23 @@ defmodule EXNN.Trainer.Sync do
       value <= state.fitness                  -> less_fit(state)
       true                                    -> fitter(state, value)
     end
+    Logger.info "[EXNN.Trainer.Sync] - sync - last fitness: #{inspect state}"
     Mutations.step
-    schedule_training_task state.sensors
-    # log "STATS:", state, :info
-    Logger.info "#{inspect state}"
+    # TODO:
+    # queued_new_sensors -> block mutate adding links -> update state.sensors -> release
+    {:ok, _ref} = schedule_training_task state.sensors
     {:reply, :ok, %{new_state | counter: new_state.counter + 1}}
   end
 
   def handle_call {:sync, %{}}, _from, state do
-    ref = schedule_training_task state.sensors
+    {:ok, _ref} = schedule_training_task state.sensors
     {:reply, :ok, state}
   end
 
-  def handle_info({:DOWN, ref, :process, pid, _reason}, state) do
+  def handle_info {:DOWN, _ref, :process, _pid, reason}, state do
+    if reason != :normal do
+      Logger.error "[EXNN.Trainer.Sync] task down with reason: #{inspect reason}"
+    end
     {:noreply, state}
   end
 

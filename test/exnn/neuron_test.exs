@@ -19,7 +19,7 @@ defmodule EXNN.NeuronTest do
 
     on_exit fn ->
       IO.puts "This is invoked once the test is done"
-      [pid_1, pid_2] |> Enum.each &(Process.exit &1, :kill)
+      [pid_1, pid_2] |> Enum.each(&Process.exit &1, :kill)
     end
 
     {:ok, []}

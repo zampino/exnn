@@ -23,7 +23,8 @@ defmodule EXNN.Fitness do
   defmacro __using__(options \\ []) do
     quote location: :keep do
       use GenServer
-      defstruct unquote(options) |> Keyword.get(:state, [])
+      defstruct unquote(options)
+        |> Keyword.get(:state, [])
 
       def start_link do
         GenServer.start_link(__MODULE__, :ok, name: EXNN.Fitness)

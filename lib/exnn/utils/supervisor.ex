@@ -1,18 +1,17 @@
 defmodule EXNN.Utils.Supervisor do
-  defmacro __using__(opts) do
+  defmacro __using__(_) do
     quote do
 
       def child(previous, mod, type\\:worker, args, options\\[]) do
-        _worker = worker_for(type, mod, args, options)
-        previous ++ [_worker]
+        previous ++ [worker_for(type, mod, args, options)]
       end
 
       def worker_for(:worker, mod, args, options) do
-        worker(mod, args)
+        worker(mod, args, options)
       end
 
       def worker_for(:supervisor, mod, args, options) do
-        supervisor(mod, args)
+        supervisor(mod, args, options)
       end
 
     end

@@ -1,12 +1,13 @@
 defmodule EXNN.Events.Manager do
   use GenEvent
+  require Logger
 
   def start_link do
     GenEvent.start_link(name: __MODULE__)
   end
 
   def init(:ok) do
-    {:ok, %{}}
+    {:ok, nil}
   end
 
   # PUBLIC CLIENT API
@@ -17,13 +18,14 @@ defmodule EXNN.Events.Manager do
 
   # SERVER CALLBACKS
 
-  def handle_event({:fitness, {message, metadata}}, messages) do
+  def handle_event {:fitness, {message, metadata}}, state do
+    Logger.debug "[EXNN.Events.Manager] -- handle :fitness event message #{inspect message} - meta: #{inspect metadata}"
     :ok = EXNN.Fitness.eval message, metadata
-    {:ok, messages}
+    {:ok, state}
   end
 
-  def handle_event(_event, messages) do
-    {:ok, messages}
+  def handle_event(_event, state) do
+    {:ok, state}
   end
 
 end

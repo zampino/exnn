@@ -26,14 +26,15 @@ defmodule EXNN.Actuator do
       end
 
       def notify_fitness(message, metadata) do
-        EXNN.Events.Manager.notify :fitness, {message, metadata}
+        :ok = EXNN.Events.Manager.notify :fitness, {message, metadata}
         # :ok = EXNN.Fitness.eval message, metadata
       end
 
-      defimpl EXNN.Connection, for: unquote(caller) do
+      defimpl EXNN.Connection do
         require Logger
-        Logger.debug "PROTOCOL #{inspect @protocol} IMPL FOR #{inspect @for}"
         def signal(actuator, message, metadata) do
+          Logger.debug "[EXNN.Actuator] - signal: #{inspect message}"
+
           state = unquote(caller).act(actuator, message, metadata)
           # TODO: pass actuator state to fitness as well
           unquote(caller).notify_fitness(message, metadata)

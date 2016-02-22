@@ -12,15 +12,21 @@ defmodule EXNN.NodeServer do
     GenServer.call(id, {:patch, partial})
   end
 
+  # TODO: multi-patch
+  # def patch [{id, changes} | rest] do
+  #   [patch {id, changes} | patch rest]
+  # end
+  #
+  # def patch list when is_list(list) do: list
+
   @doc "dumps current genome to Connectome"
   def dump(id) do
     GenServer.call(id, :dump)
   end
 
-  defmacro __using__(options) do
+  defmacro __using__(_) do
     quote do
       use GenServer
-      # import EXNN.Utils.Logger
 
       def start_link(genome) do
         GenServer.start_link(__MODULE__, genome, name: genome.id)
@@ -40,7 +46,6 @@ defmodule EXNN.NodeServer do
         {:reply, :ok, EXNN.Connection.signal(connectable, message, metadata)}
       end
 
-      # TODO: move to neuron 
       def handle_call({:patch, fun}, _from, node) do
         state = Map.merge(node, fun.(node))
         destruct = Map.from_struct state

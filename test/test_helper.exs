@@ -47,7 +47,7 @@ end
 defmodule HostApp.SensOne do
   use EXNN.Sensor
 
-  def sense(sensor, _meta) do
+  def sense(_sensor, _meta) do
     {0.1}
   end
 end
@@ -55,7 +55,7 @@ end
 defmodule HostApp.SensTwo do
   use EXNN.Sensor
 
-  def sense(sensor, _meta) do
+  def sense(_sensor, _meta) do
     {0.1, 0.9}
   end
 end

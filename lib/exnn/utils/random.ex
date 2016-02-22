@@ -1,11 +1,9 @@
 defmodule EXNN.Utils.Random do
   @moduledoc false
-  # NOTE: Randomness is NOT Math
-  # import EXNN.Utils.Logger
   import EXNN.Utils.Math, only: [pi: 0]
 
   def seed do
-    :random.seed :erlang.now
+    :random.seed :os.timestamp
   end
 
   def uniform do
@@ -23,10 +21,12 @@ defmodule EXNN.Utils.Random do
 
   @doc "randomly chooses size distinct elements out of list"
   def take(list, size) when is_integer(size) do
-    0..length(list)-1
-    |> Enum.shuffle
-    |> Enum.take(size)
-    |> Enum.map(fn(index)-> Enum.at(list, index) end)
+    # seed
+    # 0..length(list)-1
+    # |> Enum.shuffle
+    # |> Enum.take(size)
+    # |> Enum.map(fn(index)-> Enum.at(list, index) end)
+    Enum.take_random list, size
   end
 
   @doc "choses elements out of set with probability p"

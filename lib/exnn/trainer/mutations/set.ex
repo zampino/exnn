@@ -1,6 +1,6 @@
 defmodule EXNN.Trainer.Mutations.Set do
   @moduledoc false
-  # import EXNN.Utils.Logger
+  
 
   alias EXNN.Utils.Math
   alias EXNN.Utils.Random
@@ -61,37 +61,29 @@ defmodule EXNN.Trainer.Mutations.Set do
     end
 
     # Alter weights
-
     def build_changes %Mutation{type: :alter_weights}=mutation, genome do
       weights = genome.ins
       keys = Keyword.keys(weights)
       length = Enum.count keys
       space = Math.inv_sqrt(length)
       sampled = keys |> Random.sample(space)
-      sampled |> Enum.reduce mutation, fn(key, acc)->
+      sampled |> Enum.reduce(mutation, fn(key, acc)->
         old = weights[key]
         new = Random.coefficient(old)
         %{acc | changes: [{key, old, new} | acc.changes]}
-      end
-    end
-
-    def inverse %Mutation{type: :alter_weights, changes: changes}=mutation do
-      inverse_changes = Enum.map changes,
-        fn({key, old, new}) -> {key, new, old} end
-      %{mutation | changes: inverse_changes}
+      end)
     end
 
     # Reset Weights
-
     def build_changes %Mutation{type: :reset_weigths}=mutation, genome do
       weights = genome.ins
 
       Keyword.keys(weights)
-      |> Enum.reduce mutation, fn(key, acc)->
+      |> Enum.reduce(mutation, fn(key, acc)->
         old = weights[key]
         new = Random.uniform
         %{acc | changes: [{key, old, new} | acc.changes]}
-      end
+      end)
     end
 
     # Alter Bias
@@ -100,13 +92,19 @@ defmodule EXNN.Trainer.Mutations.Set do
       %{mutation | changes: {:bias, bias, Random.coefficient(bias)}}
     end
 
-    def inverse %Mutation{type: :alter_bias, changes: {:bias, old, new}}=mutation do
-      %{mutation | changes: {:bias, new, old}}
-    end
-
     def build_changes %Mutation{type: :reset_bias}=mutation, genome do
       bias = genome.bias
       %{mutation | changes: {:bias, bias, EXNN.Genome.random_bias}}
+    end
+
+    def inverse %Mutation{type: :alter_weights, changes: changes}=mutation do
+      inverse_changes = Enum.map changes,
+      fn({key, old, new}) -> {key, new, old} end
+      %{mutation | changes: inverse_changes}
+    end
+
+    def inverse %Mutation{type: :alter_bias, changes: {:bias, old, new}}=mutation do
+      %{mutation | changes: {:bias, new, old}}
     end
 
   end

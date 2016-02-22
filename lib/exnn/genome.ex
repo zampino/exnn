@@ -17,7 +17,7 @@ defmodule EXNN.Genome do
   alias EXNN.Utils.Math
 
   def collect(type, ids) do
-    ids |> Enum.map &build(type, &1)
+    ids |> Enum.map(&build type, &1)
   end
 
   def random_bias, do: (Math.pi * Random.uniform)

@@ -16,7 +16,7 @@ defmodule EXNN.Connectome do
   """
 
   alias EXNN.Utils.Random
-  # import EXNN.Utils.Logger
+
 
   # TODO: decouple storage from link/patterns
   #       into Connectome.Links and Connectome.Pattern
@@ -27,14 +27,14 @@ defmodule EXNN.Connectome do
     store = pattern
     |> EXNN.Pattern.build_layers
     |> link([], dimensions)
-    |> Enum.reduce HashDict.new, &store/2
+    |> Enum.reduce(HashDict.new, &store/2)
 
     Agent.start_link(fn() -> store end, name: __MODULE__)
   end
 
   @doc "returns the list of all genomes"
   def all do
-    unkey = fn(dict)-> dict |> Enum.map &(elem(&1, 1)) end
+    unkey = fn(dict)-> dict |> Enum.map(&elem &1, 1) end
     Agent.get __MODULE__, unkey
   end
 
@@ -71,25 +71,23 @@ defmodule EXNN.Connectome do
 
   defp link([], acc, _), do: List.flatten(acc)
 
-  @doc "actuators are processe as first"
   defp link([{:actuator, list} | rest], [], dimensions) do
-    [{previous_type, previous_list} | tail] = rest
+    [{_previous_type, previous_list} | _tail] = rest
     genomes = EXNN.Genome.collect(:actuator, list)
     |> EXNN.Genome.set_ins(previous_list)
     link(rest, [genomes], dimensions)
   end
 
-  @doc "and sensors are last"
   defp link([{:sensor, first_list}], acc, dimensions) do
-    [outs | rest] = acc
+    [outs | _rest] = acc
     genomes = EXNN.Genome.collect(:sensor, first_list)
     |> EXNN.Genome.set_outs(outs)
     link([], [genomes | acc], dimensions)
   end
 
   defp link([{type, list} | rest], acc, dimensions) do
-    [{previous_type, previous_list} | tail] = rest
-    [outs | tail] = acc
+    [{_previous_type, previous_list} | _tail] = rest
+    [outs | _tail] = acc
     genomes = EXNN.Genome.collect(type, list)
     |> EXNN.Genome.set_ins(previous_list, dimensions)
     |> EXNN.Genome.set_outs(outs)

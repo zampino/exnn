@@ -31,9 +31,11 @@ defmodule EXNN.Sensor do
   defmacro __using__(options \\ []) do
     caller = __CALLER__.module
     quote location: :keep do
+      require Logger
       use EXNN.NodeServer
-      defstruct unquote(options) |>
-        Keyword.get(:state, []) |> Dict.merge([id: nil, outs: []])
+      defstruct unquote(options)
+        |> Keyword.get(:state, [])
+        |> Dict.merge([id: nil, outs: []])
 
       @doc "#sense must be implemented in the sensor implementation"
       def sync(sensor, metadata) do
@@ -50,7 +52,8 @@ defmodule EXNN.Sensor do
         cast_out = fn(out_id) ->
           EXNN.NodeServer.forward(out_id, spread_value, [{sensor.id, value}])
         end
-        :ok = sensor.outs |> Enum.each(cast_out)
+        sensor.outs |> Enum.each(cast_out)
+        Logger.debug "[EXNN.Sensor] - fanned out #{inspect value} (#{inspect spread_value}) from #{sensor.id} to #{inspect sensor.outs}"
         sensor
       end
 
@@ -70,7 +73,7 @@ defmodule EXNN.Sensor do
         list
       end
 
-      defimpl EXNN.Connection, for: __MODULE__ do
+      defimpl EXNN.Connection do
         def signal(sensor, :sync, metadata) do
           unquote(caller).sync(sensor, metadata)
         end

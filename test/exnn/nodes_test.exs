@@ -2,8 +2,8 @@ defmodule EXNN.NodesTest do
   use ExUnit.Case, async: true
 
   setup do #_all do
-    {_status, node_sup} = EXNN.NodeSupervisor.start_link
-    IO.puts "/////////////////////////////// exnn test node superv tries to start: #{_status}"
+    {status, node_sup} = EXNN.NodeSupervisor.start_link
+    IO.puts "/////////////////////////////// exnn test node superv tries to start: #{status}"
     # {:ok, %{sup: node_sup}}
 
     # on_exit fn ->

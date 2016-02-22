@@ -3,6 +3,7 @@ defmodule XORTest do
 
   setup do
     {:ok, _pid} = XORApp.start(:normal, [])
+    IO.puts "starting app"
 
     on_exit fn ->
       XORApp.stop(:normal)
@@ -14,10 +15,9 @@ defmodule XORTest do
 
   test "X or runs!" do
     :ok = EXNN.Trainer.start
-    :timer.sleep 3000
+    :timer.sleep 4000
   end
 end
-
 
 defmodule XORApp do
   use EXNN.Application
@@ -68,7 +68,7 @@ end
 defmodule XORApp.Fitness do
   @domain [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}]
   alias EXNN.Utils.Math
-  # import EXNN.Utils.Logger
+  
 
   use EXNN.Fitness, state: [
     trigger: @domain,

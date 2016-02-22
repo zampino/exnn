@@ -19,7 +19,7 @@ defmodule EXNN.Events.Stream do
   #   # :ok = EXNN.Fitness.eval(message, meta)
   # end
 
-  def dispatch({_, msg}) do
+  def dispatch({_, _msg}) do
     # IO.puts "dispatching event #{inspect(msg)}"
     :ok
   end

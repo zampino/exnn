@@ -11,7 +11,8 @@ as well as OTP application components.
 
 # :construction: All this is quite still in progress :construction:
 
-This library is in a very early stage, and it can at the moment only train a trivial _xor_ function. With some love and time, it will see some improvements.
+This library is in a very early stage, and it can at the moment only train a trivial _xor_ function. With some love and time, it will see some improvements. Contributions
+are welcome, of course.
 
 # Docs
 
@@ -204,13 +205,16 @@ mix test test/examples/xor_test.exs
 
 
 # Future Plans
+
+- Instrumentation for learning times and logging.
+
 - Explorative search along mutation paths (see `EXNN.Trainer.Mutations`)
   to split an individuum into two or more (mutation + mitosis).
 
 - Handle sync among a population of nets through routing with fixed sensors and actuators.
 
-- A State Machine for states 'loading'/'learning'/'production'.
-  State should switch to 'production' whenever fitness enters a tolerance
+- Rewrite `EXNN.Trainer.Sync` as a `:gen_fsm` with states 'learning'/'production'.
+  Switching to 'production' whenever fitness stably enters a tolerance
   neighborhood of 1.
 
 # References

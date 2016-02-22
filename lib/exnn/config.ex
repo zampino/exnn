@@ -24,20 +24,20 @@ defmodule EXNN.Config do
   end
 
   def sensor_dimensions(config) do
-    filter = fn({type, id, mod, opts})->
+    filter = fn {type, _id, _mod, _opts} ->
       type == :sensor
     end
-    mapper = fn({type, id, mod, opts})->
+    mapper = fn {_type, id, _mod, opts} ->
       {id, opts[:dim]}
     end
     Map.get(config, :remote_nodes) |> Enum.filter_map(filter, mapper)
   end
 
   def sensors do
-    filter = fn({type, id, mod, opts})->
+    filter = fn {type, _id, _mod, _opts} ->
       type == :sensor
     end
-    mapper = fn({type, id, mod, opts})-> id end
+    mapper = fn {_type, id, _mod, _opts} -> id end
     get_remote_nodes |> Enum.filter_map(filter, mapper)
   end
 

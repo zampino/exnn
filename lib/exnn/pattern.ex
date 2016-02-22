@@ -16,11 +16,6 @@ defmodule EXNN.Pattern do
     expand({type, number}, acc, nil)
   end
 
-  def expand({type, number}, acc, pref) when is_integer(number) do
-    names = Enum.map 1..number, &(label(type, &1, pref))
-    [{type, names} | acc]
-  end
-
   def expand({type, list}, acc) when is_list(list) do
     [{type, list} | acc]
   end
@@ -31,6 +26,11 @@ defmodule EXNN.Pattern do
     end
     {acc, _} = List.foldl Tuple.to_list(tuple), {acc, 1}, iterator
     acc
+  end
+
+  def expand({type, number}, acc, pref) when is_integer(number) do
+    names = Enum.map 1..number, &(label(type, &1, pref))
+    [{type, names} | acc]
   end
 
   def label(type, int, prefix) do

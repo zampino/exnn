@@ -1,7 +1,7 @@
 defmodule EXNN.Trainer.MutationsTest do
   alias EXNN.Trainer.Mutations.Set
   alias EXNN.Trainer.Mutations.Agent
-  # import EXNN.Utils.Logger
+  
 
   use ExUnit.Case
 

@@ -30,7 +30,6 @@ defmodule EXNN.SensorTest do
     end
 
     def before_sync(sensor) do
-      # IO.puts "registered with: #{Process.whereis(self)}"
       new_store = sensor.store ++ [extra: 1]
       %__MODULE__{sensor | store: new_store}
     end
@@ -39,8 +38,8 @@ defmodule EXNN.SensorTest do
 
   setup do
     genome = %{id: :my_name, outs: [:test_out]}
-    {:ok, pid} = GenServer.start_link(TestOut, [], name: :test_out)
-    {:ok, sensor} = TestSensorX.start_link(genome)
+    {:ok, _pid} = GenServer.start_link(TestOut, [], name: :test_out)
+    {:ok, _sensor} = TestSensorX.start_link(genome)
     {:ok, []}
   end
 

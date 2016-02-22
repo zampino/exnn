@@ -1,4 +1,5 @@
 defmodule EXNN.Neuron do
+  require Logger
   @moduledoc """
     # Neuron Data Structure
 
@@ -21,10 +22,9 @@ defmodule EXNN.Neuron do
   @doc "broadcast input to registered outs and resets its trigger"
   def fire(%{trigger: []} = neuron) do
     {neuron, value} = impulse(neuron)
-
+    Logger.debug "[EXNN.Neuron] #{neuron.id} firing #{inspect value} to #{inspect neuron.outs}"
     neuron.outs |>
-    Enum.each(&forward(&1, neuron, value))
-
+      Enum.each(&forward(&1, neuron, value))
     %{neuron | trigger: Dict.keys(neuron.ins)}
   end
 
@@ -37,8 +37,10 @@ defmodule EXNN.Neuron do
   def impulse(neuron) do
     {activation_input, acc} = Enum.reduce(neuron.ins,
       {0, neuron.acc}, &Math.labelled_scalar_product/2)
-    _impulse = neuron.activation.(activation_input + neuron.bias)
-    {%{neuron | acc: acc}, _impulse}
+    {
+      %{neuron | acc: acc},
+      neuron.activation.(activation_input + neuron.bias)
+    }
   end
 
   def signal(neuron, message, metadata\\[]) do

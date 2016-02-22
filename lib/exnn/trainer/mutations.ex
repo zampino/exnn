@@ -4,7 +4,7 @@ defmodule EXNN.Trainer.Mutations do
   alias EXNN.Trainer.Mutations.Set
   alias EXNN.Trainer.Mutations.Agent
 
-  # import EXNN.Utils.Logger
+  
 
   def start_link do
     GenServer.start_link __MODULE__,
