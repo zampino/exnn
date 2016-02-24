@@ -11,12 +11,19 @@ config :exnn,
 # if you want to provide default values for your application for third-
 # party users, it should be done in your mix.exs file.
 
+
+sys_level = case System.get_env("LOG_LEVEL") do
+  nil -> nil
+  flag -> String.to_atom(flag)
+end
+
 # Sample configuration:
 #
 config :logger, :console,
-  level: :info,
+  level: sys_level || :info,
   format: "$date $time [$level] $metadata$message\n",
   metadata: [:user_id]
+
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

@@ -32,4 +32,5 @@ defmodule EXNN.Trainer.SyncTest do
 
     refute Enum.empty?(recorded)
   end
+
 end

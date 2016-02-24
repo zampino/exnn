@@ -1,4 +1,5 @@
 defmodule XORTest do
+  require Logger
   use ExUnit.Case, async: true
 
   setup do
@@ -14,8 +15,11 @@ defmodule XORTest do
   end
 
   test "X or runs!" do
-    :ok = EXNN.Trainer.start
-    :timer.sleep 4000
+    :ok = EXNN.Trainer.start reporter: self
+
+    assert_receive {:report, state}, 5_000
+    Logger.info "\nTrained stably to #{inspect state.fitness} in #{state.fit_after} ms\n"
+    Logger.info inspect state
   end
 end
 
@@ -24,13 +28,15 @@ defmodule XORApp do
 
   sensor :s, XORApp.Domain, dim: 2
   actuator :a, XORApp.Range
-  fitness XORApp.Fitness, mode: :sync # :continuous
+  fitness XORApp.Fitness
 
   initial_pattern([
     sensor: [:s],
     neuron: {2, 1},
     actuator: [:a]
   ])
+
+  train_with mode: :continuous, stable_after: 10, tolerance: 0.01, epochs: 5_000
 
   def start(_, _) do
     import Supervisor.Spec, warn: false
@@ -68,7 +74,7 @@ end
 defmodule XORApp.Fitness do
   @domain [{-1, -1}, {-1, 1}, {1, -1}, {1, 1}]
   alias EXNN.Utils.Math
-  
+
 
   use EXNN.Fitness, state: [
     trigger: @domain,

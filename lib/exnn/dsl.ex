@@ -11,7 +11,6 @@ defmodule EXNN.DSL do
 
   defmacro initial_pattern(pattern) do
     quote do
-      # Module.put_attribute(__MODULE__, :init_pattern, unquote(pattern))
       @initial_pattern unquote(pattern)
     end
   end
@@ -35,24 +34,15 @@ defmodule EXNN.DSL do
   end
 
   defmacro __before_compile__(env) do
-    nodes = Module.get_attribute(env.module, :nodes)
-      |> Macro.escape
-    pattern = Module.get_attribute(env.module, :initial_pattern)
-      |> Macro.escape
+    nodes = Module.get_attribute(env.module, :nodes) |> Macro.escape
+    pattern = Module.get_attribute(env.module, :initial_pattern) |> Macro.escape
     fitness = Module.get_attribute(env.module, :fitness)
+    mode = Module.get_attribute(env.module, :mode)
 
     quote do
-      def initial_pattern do
-        unquote pattern
-      end
-
-      def nodes do
-        unquote nodes
-      end
-
-      def fitness do
-        unquote fitness
-      end
+      def initial_pattern, do: unquote(pattern)
+      def nodes, do: unquote(nodes)
+      def fitness, do: unquote(fitness)
     end
   end
 

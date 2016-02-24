@@ -16,7 +16,7 @@ defmodule EXNN.Supervisor do
     |> child(EXNN.NodeSupervisor, :supervisor, [])
     |> child(EXNN.Nodes, [])
     |> child(EXNN.Nodes.Loader, [])
-    |> child(EXNN.Trainer.Supervisor, :supervisor, [])
+    |> child(EXNN.Trainer.Supervisor, :supervisor, [mod])
     |> supervise(strategy: :one_for_one)
   end
 
