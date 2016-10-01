@@ -91,7 +91,7 @@ On the other hand,
 since it's a genserver registered with its module name, you can reach it
 from any external service providing sample data:
 
-An optional `state` given to `use` accepts a keywork list to
+An optional `state` given to `use` accepts a keyword list to
 feed initial conditions to the genserver state.
 The state itself is a struct, named by your module's name.
 
