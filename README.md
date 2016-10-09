@@ -134,7 +134,7 @@ You have to implement an `act/3` method which takes the current state,
 a signal arrived from the neuronal layer and some metadata (more on
 metadata later). `act/3` can have the side-effects you desire
 and must return the modified state.
-The message passed to `act/3` is a keywork list
+The message passed to `act/3` is a keyword list
 `[n_id: v]` with a key `n_id` identifying the firing neuron,
 and a scalar float value `v`.
 
