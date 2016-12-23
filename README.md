@@ -112,7 +112,7 @@ defmodule MyApp.WindSensor do
   use EXNN.Sensor, state: [speed: 0, direction: 0 * :math.pi]
 
   def sense(state, _meta) do
-    {state.speed, state.direction})
+    {state.speed, state.direction}
   end
 
   # ...some callbacks to update state...
