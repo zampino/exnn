@@ -1,28 +1,3 @@
-defmodule XORTest do
-  require Logger
-  use ExUnit.Case, async: true
-
-  setup do
-    {:ok, _pid} = XORApp.start(:normal, [])
-    IO.puts "starting app"
-
-    on_exit fn ->
-      XORApp.stop(:normal)
-      IO.puts "terminating app: XOR"
-    end
-
-    {:ok, []}
-  end
-
-  test "X or runs!" do
-    :ok = EXNN.Trainer.start reporter: self
-
-    assert_receive {:report, state}, 5_000
-    Logger.info "\nTrained stably to #{inspect state.fitness} in #{state.fit_after} ms\n"
-    Logger.info inspect state
-  end
-end
-
 defmodule XORApp do
   use EXNN.Application
 
@@ -117,5 +92,29 @@ defmodule XORApp.Fitness do
     trigger = List.delete state.trigger, x
     %{state | trigger: trigger, acc: acc}
   end
+end
 
+defmodule XORTest do
+  require Logger
+  use ExUnit.Case, async: true
+
+  setup do
+    {:ok, _pid} = XORApp.start(:normal, [])
+    IO.puts "starting app"
+
+    on_exit fn ->
+      XORApp.stop(:normal)
+      IO.puts "terminating app: XOR"
+    end
+
+    {:ok, []}
+  end
+
+  test "X or runs!" do
+    :ok = EXNN.Trainer.start reporter: self
+
+    assert_receive {:report, state}, 5_000
+    Logger.info "\nTrained stably to #{inspect state.fitness} in #{state.fit_after} ms\n"
+    Logger.info inspect state
+  end
 end

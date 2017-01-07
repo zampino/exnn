@@ -3,15 +3,15 @@ defmodule EXNN.Utils.Random do
   import EXNN.Utils.Math, only: [pi: 0]
 
   def seed do
-    :random.seed :os.timestamp
+    :rand.seed :exs1024, :os.timestamp
   end
 
   def uniform do
-    :random.uniform
+    :rand.uniform
   end
 
   def coefficient(value) do
-    value * pi * (:random.uniform - 0.5)
+    value * pi * (:rand.uniform - 0.5)
   end
 
   def take(list) do

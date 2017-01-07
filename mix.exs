@@ -5,7 +5,7 @@ defmodule EXNN.Mixfile do
     [
       app: :exnn,
       version: "0.1.0",
-      elixir: "~> 1.2",
+      elixir: "~> 1.3",
       deps: deps,
       name: "EXNN",
       description: ~s(Elixir Evolutive Neural Networks "<> <<224::utf8>> <>" la G.Sher),

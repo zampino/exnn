@@ -18,7 +18,7 @@ defmodule EXNN.Utils.Math do
 
   def sin(x), do: :math.sin(x)
 
-  def sigmoid(x, k)
+  def sigmoid(_x, _k), do: nil # TODO
 
   def labelled_scalar_product({id, weight}, {memo, acc}) do
     {val, acc} = Keyword.pop_first acc, id

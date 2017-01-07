@@ -37,7 +37,7 @@ defmodule EXNN.DSL do
     nodes = Module.get_attribute(env.module, :nodes) |> Macro.escape
     pattern = Module.get_attribute(env.module, :initial_pattern) |> Macro.escape
     fitness = Module.get_attribute(env.module, :fitness)
-    mode = Module.get_attribute(env.module, :mode)
+    # mode = Module.get_attribute(env.module, :mode)
 
     quote do
       def initial_pattern, do: unquote(pattern)

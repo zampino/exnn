@@ -34,10 +34,7 @@ defmodule EXNN.Pattern do
   end
 
   def label(type, int, prefix) do
-    front = type
-    if prefix do
-      front = "#{front}_#{prefix}"
-    end
+    front = if prefix, do: "#{type}_#{prefix}", else: type
     :"#{front}_#{int}"
   end
 end

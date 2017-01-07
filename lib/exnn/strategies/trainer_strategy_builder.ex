@@ -11,7 +11,8 @@ defmodule EXNN.Strategies.TrainerStrategyBuilder do
         }
         import EXNN.Strategies.TrainerStrategyBuilder,
           only: [impl_for: 2]
-        IO.puts "what the hell is #{inspect {__MODULE__, unquote(mode)}}"
+
+        # IO.puts "what the hell is #{inspect {__MODULE__, unquote(mode)}}"
 
         impl_for unquote(mode), unquote(options)
       end

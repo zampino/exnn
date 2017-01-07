@@ -1,6 +1,20 @@
 defmodule EXNN.NodesTest do
   use ExUnit.Case, async: true
 
+  defmodule TestSensor do
+    use GenServer
+
+    def start_link(genome) do
+      send :test_pid, genome.message
+      GenServer.start_link(__MODULE__, genome, [name: genome.id])
+    end
+
+    def handle_cast :foo, state do
+      IO.puts "foo!!!"
+      {:noreply, state}
+    end
+  end
+
   setup do #_all do
     {status, node_sup} = EXNN.NodeSupervisor.start_link
     IO.puts "/////////////////////////////// exnn test node superv tries to start: #{status}"
@@ -57,18 +71,4 @@ restarted", %{genome: genome} do
     assert pid == nil
   end
 
-end
-
-defmodule TestSensor do
-  use GenServer
-
-  def start_link(genome) do
-    send :test_pid, genome.message
-    GenServer.start_link(__MODULE__, genome, [name: genome.id])
-  end
-
-  def handle_cast :foo, state do
-    IO.puts "foo!!!"
-    {:noreply, state}
-  end
 end
